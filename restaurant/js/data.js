@@ -39,6 +39,60 @@ const M = [
   ['masala-chai', 'drinks', 50, 1, 0, 'Kulhad Chai', 'कुल्हड़ चाय', 'ਕੁੱਲ੍ਹੜ ਚਾਹ', 'Ginger-cardamom tea in a clay cup'],
 ];
 
+// Hindi / Punjabi descriptions of the sample dishes (the dish names above stay as they are).
+// Shown only while a dish still has its original English description; once the owner edits it, their text is shown as typed.
+export const DESC_I18N = {
+  'paneer-tikka': { hi: 'पनीर, गाढ़े दही का मसाला, तंदूर में सेका हुआ', pa: 'ਪਨੀਰ, ਗਾੜ੍ਹੇ ਦਹੀਂ ਦਾ ਮਸਾਲਾ, ਤੰਦੂਰ ਵਿੱਚ ਸੇਕਿਆ ਹੋਇਆ' },
+  'amritsari-fish': { hi: 'अजवाइन वाले बेसन में तली मछली, नींबू, चाट मसाला', pa: 'ਅਜਵਾਇਣ ਵਾਲੇ ਵੇਸਣ ਵਿੱਚ ਤਲੀ ਮੱਛੀ, ਨਿੰਬੂ, ਚਾਟ ਮਸਾਲਾ' },
+  'hara-bhara-kebab': { hi: 'पालक, मटर और आलू की टिक्की, पुदीने की चटनी के साथ', pa: 'ਪਾਲਕ, ਮਟਰ ਅਤੇ ਆਲੂ ਦੀ ਟਿੱਕੀ, ਪੁਦੀਨੇ ਦੀ ਚਟਨੀ ਨਾਲ' },
+  'chicken-65': { hi: 'हरी मिर्च और करी पत्ते के साथ कड़ाही में भुना', pa: 'ਹਰੀ ਮਿਰਚ ਅਤੇ ਕੜੀ ਪੱਤੇ ਨਾਲ ਕੜਾਹੀ ਵਿੱਚ ਭੁੰਨਿਆ' },
+  'tandoori-chicken': { hi: 'रात भर मसाले में रखा, फिर तंदूर में सेका हुआ', pa: 'ਸਾਰੀ ਰਾਤ ਮਸਾਲੇ ਵਿੱਚ ਰੱਖਿਆ, ਫਿਰ ਤੰਦੂਰ ਵਿੱਚ ਸੇਕਿਆ ਹੋਇਆ' },
+  'malai-tikka': { hi: 'मलाई, चीज़ और इलायची — हल्का और रसीला', pa: 'ਮਲਾਈ, ਚੀਜ਼ ਅਤੇ ਇਲਾਇਚੀ — ਹਲਕਾ ਅਤੇ ਰਸੀਲਾ' },
+  'soya-chaap': { hi: 'मक्खन और प्याज़ के छल्लों के साथ बाज़ार वाली चाप', pa: 'ਮੱਖਣ ਅਤੇ ਪਿਆਜ਼ ਦੇ ਛੱਲਿਆਂ ਨਾਲ ਬਾਜ਼ਾਰ ਵਾਲੀ ਚਾਪ' },
+  'butter-chicken': { hi: 'टमाटर और मक्खन की मुलायम ग्रेवी में तंदूरी चिकन', pa: 'ਟਮਾਟਰ ਅਤੇ ਮੱਖਣ ਦੀ ਮੁਲਾਇਮ ਗ੍ਰੇਵੀ ਵਿੱਚ ਤੰਦੂਰੀ ਚਿਕਨ' },
+  'dal-makhani': { hi: 'रात भर धीमी आँच पर पकी काली दाल, ऊपर से सफ़ेद मक्खन', pa: 'ਸਾਰੀ ਰਾਤ ਹੌਲੀ ਅੱਗ ਉੱਤੇ ਪੱਕੀ ਕਾਲੀ ਦਾਲ, ਉੱਤੋਂ ਚਿੱਟਾ ਮੱਖਣ' },
+  'sarson-saag': { hi: 'सरसों का साग, ऊपर से सफ़ेद मक्खन (सर्दियों की खास डिश)', pa: 'ਸਰ੍ਹੋਂ ਦਾ ਸਾਗ, ਉੱਤੋਂ ਚਿੱਟਾ ਮੱਖਣ (ਸਰਦੀਆਂ ਦੀ ਖ਼ਾਸ ਡਿਸ਼)' },
+  'kadhai-paneer': { hi: 'पनीर, शिमला मिर्च और ताज़ा पिसा कड़ाही मसाला', pa: 'ਪਨੀਰ, ਸ਼ਿਮਲਾ ਮਿਰਚ ਅਤੇ ਤਾਜ਼ਾ ਪੀਸਿਆ ਕੜਾਹੀ ਮਸਾਲਾ' },
+  chole: { hi: 'अनारदाना और अमचूर वाले गहरे, खट्टे छोले', pa: 'ਅਨਾਰਦਾਣੇ ਅਤੇ ਅੰਬਚੂਰ ਵਾਲੇ ਗੂੜ੍ਹੇ, ਖੱਟੇ ਛੋਲੇ' },
+  rajma: { hi: 'घर जैसा राजमा, जैसा पंजाब को पसंद है', pa: 'ਘਰ ਵਰਗਾ ਰਾਜਮਾ, ਜਿਵੇਂ ਪੰਜਾਬ ਨੂੰ ਪਸੰਦ ਹੈ' },
+  'mutton-rogan': { hi: 'धीमी आँच पर पका मटन, कश्मीरी मिर्च, साबुत मसाले', pa: 'ਹੌਲੀ ਅੱਗ ਉੱਤੇ ਪੱਕਿਆ ਮਟਨ, ਕਸ਼ਮੀਰੀ ਮਿਰਚ, ਸਾਬਤ ਮਸਾਲੇ' },
+  'makki-roti': { hi: 'हाथ से थपथपाकर बनी मक्की के आटे की रोटी', pa: 'ਹੱਥ ਨਾਲ ਥਾਪ ਕੇ ਬਣੀ ਮੱਕੀ ਦੇ ਆਟੇ ਦੀ ਰੋਟੀ' },
+  'butter-naan': { hi: 'मक्खन लगा नरम तंदूरी नान', pa: 'ਮੱਖਣ ਲੱਗਿਆ ਨਰਮ ਤੰਦੂਰੀ ਨਾਨ' },
+  'garlic-naan': { hi: 'ऊपर से लहसुन और हरा धनिया', pa: 'ਉੱਤੋਂ ਲਸਣ ਅਤੇ ਹਰਾ ਧਨੀਆ' },
+  'lachha-paratha': { hi: 'परतदार, खस्ता गेहूँ का पराठा', pa: 'ਪਰਤਾਂ ਵਾਲਾ, ਖ਼ਸਤਾ ਕਣਕ ਦਾ ਪਰੌਂਠਾ' },
+  'amritsari-kulcha': { hi: 'मसालेदार आलू भरा, छोलों के साथ', pa: 'ਮਸਾਲੇਦਾਰ ਆਲੂ ਭਰਿਆ, ਛੋਲਿਆਂ ਨਾਲ' },
+  'jeera-rice': { hi: 'जीरे के तड़के वाले बासमती चावल', pa: 'ਜੀਰੇ ਦੇ ਤੜਕੇ ਵਾਲੇ ਬਾਸਮਤੀ ਚੌਲ' },
+  'veg-biryani': { hi: 'सब्ज़ियों और केसर के साथ परतों में बनी बासमती', pa: 'ਸਬਜ਼ੀਆਂ ਅਤੇ ਕੇਸਰ ਨਾਲ ਪਰਤਾਂ ਵਿੱਚ ਬਣੀ ਬਾਸਮਤੀ' },
+  'chicken-biryani': { hi: 'तले प्याज़ और पुदीने के साथ धीमी आँच पर पकी', pa: 'ਤਲੇ ਪਿਆਜ਼ ਅਤੇ ਪੁਦੀਨੇ ਨਾਲ ਹੌਲੀ ਅੱਗ ਉੱਤੇ ਪੱਕੀ' },
+  'gulab-jamun': { hi: 'गरम, इलायची वाली चाशनी में डूबे', pa: 'ਗਰਮ, ਇਲਾਇਚੀ ਵਾਲੀ ਚਾਸ਼ਨੀ ਵਿੱਚ ਡੁੱਬੇ' },
+  phirni: { hi: 'पिसे चावल की खीर, मिट्टी के बर्तनों में जमी', pa: 'ਪੀਸੇ ਚੌਲਾਂ ਦੀ ਖੀਰ, ਮਿੱਟੀ ਦੇ ਭਾਂਡਿਆਂ ਵਿੱਚ ਜੰਮੀ' },
+  'gajar-halwa': { hi: 'धीमी आँच पर पकी गाजर, खोया और मेवे', pa: 'ਹੌਲੀ ਅੱਗ ਉੱਤੇ ਪੱਕੀ ਗਾਜਰ, ਖੋਆ ਅਤੇ ਮੇਵੇ' },
+  lassi: { hi: 'मलाई वाली मीठी लस्सी का बड़ा गिलास', pa: 'ਮਲਾਈ ਵਾਲੀ ਮਿੱਠੀ ਲੱਸੀ ਦਾ ਵੱਡਾ ਗਲਾਸ' },
+  'masala-chaas': { hi: 'भुने जीरे वाली मसालेदार छाछ', pa: 'ਭੁੰਨੇ ਜੀਰੇ ਵਾਲੀ ਮਸਾਲੇਦਾਰ ਛਾਛ' },
+  'masala-chai': { hi: 'अदरक-इलायची वाली चाय, मिट्टी के कुल्हड़ में', pa: 'ਅਦਰਕ-ਇਲਾਇਚੀ ਵਾਲੀ ਚਾਹ, ਮਿੱਟੀ ਦੇ ਕੁੱਲ੍ਹੜ ਵਿੱਚ' },
+};
+const SEED_DESC = Object.fromEntries(M.map((r) => [r[0], r[8]]));
+
+/** Dish description in the chosen language (falls back to the text the owner typed). */
+export function itemDesc(item, lang) {
+  if (!item) return '';
+  const tr = DESC_I18N[item.id];
+  if (lang !== 'en' && tr && tr[lang] && item.desc === SEED_DESC[item.id]) return tr[lang];
+  return item.desc || '';
+}
+
+// Sample notes and addresses used in the demo orders and bookings.
+export const SAMPLE_TEXT = {
+  'Less spicy please': { hi: 'कृपया कम तीखा', pa: 'ਕਿਰਪਾ ਕਰਕੇ ਘੱਟ ਤਿੱਖਾ' },
+  'Birthday — needs a cake knife': { hi: 'जन्मदिन — केक काटने के लिए चाकू चाहिए', pa: 'ਜਨਮਦਿਨ — ਕੇਕ ਕੱਟਣ ਲਈ ਚਾਕੂ ਚਾਹੀਦਾ ਹੈ' },
+  'Window table if possible': { hi: 'हो सके तो खिड़की वाली टेबल', pa: 'ਹੋ ਸਕੇ ਤਾਂ ਖਿੜਕੀ ਵਾਲਾ ਟੇਬਲ' },
+  'Family dinner, 2 kids': { hi: 'परिवार के साथ डिनर, 2 बच्चे', pa: 'ਪਰਿਵਾਰ ਨਾਲ ਡਿਨਰ, 2 ਬੱਚੇ' },
+  'Office lunch': { hi: 'ऑफ़िस लंच', pa: 'ਦਫ਼ਤਰ ਦਾ ਲੰਚ' },
+  'Sample address, Sector 5': { hi: 'नमूना पता, सेक्टर 5', pa: 'ਨਮੂਨਾ ਪਤਾ, ਸੈਕਟਰ 5' },
+};
+/** A sample note in the chosen language; anything a customer or the owner typed is shown as it is. */
+export const sampleText = (s, lang) => (lang !== 'en' && SAMPLE_TEXT[s] && SAMPLE_TEXT[s][lang]) || s || '';
+
 export function seedMenu() {
   return M.map(([id, cat, price, veg, spice, en, hi, pa, desc]) => ({
     id, cat, price, veg: !!veg, spice, name: { en, hi, pa }, desc, photo: '', available: true,
@@ -91,7 +145,13 @@ export function seedRestaurant(today = todayISO()) {
   return { settings, menu, orders, reservations, counters: { order: no }, seededFor: today };
 }
 
-export const restStore = createStore({ key: REST_KEY, version: 1, seed: () => seedRestaurant() });
+/** "Start with an empty business": no orders, bookings or customers. The menu (categories, dishes, prices) and settings stay
+ *  so the owner only edits what differs; the website menu keeps working. */
+export function emptyRestaurant(current) {
+  return { settings: current.settings, menu: current.menu || seedMenu(), orders: [], reservations: [], counters: { order: 0 } };
+}
+
+export const restStore = createStore({ key: REST_KEY, version: 1, seed: () => seedRestaurant(), empty: emptyRestaurant });
 export const itemName = (item, lang) => (item.name && (item.name[lang] || item.name.en)) || item.name || '';
 
 const CAT_COLORS = { starters: ['#e9a23b', '#b5541c'], tandoor: ['#d9572b', '#8c2a14'], mains: ['#c8682c', '#7a2d10'], breads: ['#e7c27d', '#a4743a'], rice: ['#f1d58a', '#b78a2e'], desserts: ['#e39a9a', '#9b3d3d'], drinks: ['#f3e6c4', '#b89a58'] };

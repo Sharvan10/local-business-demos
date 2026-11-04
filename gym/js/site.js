@@ -77,7 +77,7 @@ form.addEventListener('submit', (e) => {
   if (!v.name || (v.phone || '').replace(/\D/g, '').length < 10) { msg.className = 'form-msg err'; msg.textContent = t('trial.err'); return; }
   try {
     const list = JSON.parse(localStorage.getItem('ironcore.enquiries') || '[]');
-    list.push({ ...v, at: new Date().toISOString() });
+    list.push({ ...v, goalKey: String(form.goal.selectedIndex + 1), at: new Date().toISOString() }); // read by the owner app's Enquiries screen
     localStorage.setItem('ironcore.enquiries', JSON.stringify(list.slice(-50)));
   } catch { /* storage blocked */ }
   const text = t('trial.waText', { gym: 'IronCore Fitness Club', name: v.name, phone: v.phone, goal: v.goal, time: t(`tm.${v.time}`) });

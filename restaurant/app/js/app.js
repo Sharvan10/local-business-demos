@@ -8,8 +8,9 @@ import { barChart, hBars } from '../../../shared/chart.js';
 import { qrSVG, qrCanvas } from '../../../shared/qr.js';
 import { pinGate, lockNow } from '../../../shared/pin.js';
 import { registerPWA, bindInstallButton } from '../../../shared/pwa.js';
+import { paintDataStrip, dataStateCard, startEmptyFlow } from '../../../shared/demo-mode.js';
 import { REST_APP_I18N } from '../../../js/i18n-restaurant-app.js';
-import { restStore as store, REST_KEY, CATEGORIES, itemName, dishArt } from '../../js/data.js';
+import { restStore as store, REST_KEY, CATEGORIES, itemName, dishArt, sampleText } from '../../js/data.js';
 import { ORDER_STATUSES, NEXT_STATUS, billTotals, dailySales, bestSellers, customers, RES_STATUSES } from '../../js/logic.js';
 
 const i18n = createI18n(REST_APP_I18N);
@@ -38,6 +39,7 @@ function render() {
   const out = fn();
   view.innerHTML = out.html;
   $('#fab').outerHTML = out.fab || '<a id="fab" class="fab" hidden></a>';
+  paintDataStrip(store.isDemo, t);
   $('#brand-name').textContent = d().settings.name;
   $('#brand-sub').textContent = fd(TODAY, { weekday: 'long', day: 'numeric', month: 'long' });
   if (out.mount) out.mount();
@@ -54,7 +56,7 @@ function orderCard(o) {
     <div class="ohead"><strong class="ono">#${o.no}</strong><span class="muted small">${esc(o.time)}${o.date !== TODAY ? ` · ${esc(fdShort(o.date))}` : ''}</span>
       <span class="chip plain">${esc(t(`type.${o.type}`))}${o.table ? ` · ${esc(t('o.table', { n: o.table }))}` : ''}</span>${o.source === 'web' ? `<span class="chip accent plain">${esc(t('o.web'))}</span>` : ''}<span class="grow"></span>${chip(o.status)}</div>
     <p class="oitems">${items}</p>
-    ${o.note ? `<p class="onote">📝 ${esc(o.note)}</p>` : ''}
+    ${o.note ? `<p class="onote">📝 ${esc(sampleText(o.note, i18n.lang))}</p>` : ''}
     <div class="ometa"><span>${esc(o.customer.name || t('o.walkin'))}${o.customer.phone ? ` · ${esc(o.customer.phone)}` : ''}</span><strong>${money(o.total)}</strong></div>
     <div class="oact">
       ${next ? `<button type="button" class="btn primary" data-act="advance" data-id="${o.id}">${icon(next === 'preparing' ? 'fire' : next === 'ready' ? 'check' : 'arrow')}${esc(t(`next.${next}`))}</button>` : ''}
@@ -118,14 +120,14 @@ function newOrder() {
   });
 }
 function kotHTML(o) {
-  return `<div class="doc slip"><h1>KOT #${o.no}</h1><p style="text-align:center">${esc(fd(o.date))} · ${esc(o.time)}<br>${esc(t(`type.${o.type}`))}${o.table ? ` · ${esc(t('o.table', { n: o.table }))}` : ''}</p><table><tbody>${o.lines.map((l) => `<tr><td><strong>${l.qty}×</strong></td><td>${esc(lineName(l))}</td></tr>`).join('')}</tbody></table>${o.note ? `<p><strong>${esc(t('o.note'))}:</strong> ${esc(o.note)}</p>` : ''}<p style="text-align:center">— ${esc(t('demo.badge'))} —</p></div>`;
+  return `<div class="doc slip"><h1>KOT #${o.no}</h1><p style="text-align:center">${esc(fd(o.date))} · ${esc(o.time)}<br>${esc(t(`type.${o.type}`))}${o.table ? ` · ${esc(t('o.table', { n: o.table }))}` : ''}</p><table><tbody>${o.lines.map((l) => `<tr><td><strong>${l.qty}×</strong></td><td>${esc(lineName(l))}</td></tr>`).join('')}</tbody></table>${o.note ? `<p><strong>${esc(t('o.note'))}:</strong> ${esc(sampleText(o.note, i18n.lang))}</p>` : ''}${store.isDemo ? `<p style="text-align:center">— ${esc(t('demo.badge'))} —</p>` : ''}</div>`;
 }
 function billHTML(o) {
   const st = d().settings;
   return `<div class="doc slip"><h1>${esc(st.name)}</h1><p style="text-align:center">${esc(t('o.billTitle'))} #${o.no}<br>${esc(fd(o.date))} ${esc(o.time)}</p>
   <table><thead><tr><th>${esc(t('o.item'))}</th><th class="r">${esc(t('o.qty'))}</th><th class="r">₹</th></tr></thead><tbody>${o.lines.map((l) => `<tr><td>${esc(lineName(l))}</td><td class="r">${l.qty}</td><td class="r">${l.qty * l.price}</td></tr>`).join('')}
   <tr><td colspan="2">${esc(t('o.sub'))}</td><td class="r">${o.sub}</td></tr><tr><td colspan="2">GST ${st.gstPct}%</td><td class="r">${o.gst}</td></tr>${o.delivery ? `<tr><td colspan="2">${esc(t('type.delivery'))}</td><td class="r">${o.delivery}</td></tr>` : ''}
-  <tr class="tot"><td colspan="2">${esc(t('o.total'))}</td><td class="r">${money(o.total)}</td></tr></tbody></table><p style="text-align:center">${esc(t('o.thanks'))}<br><span class="stamp">${esc(t('demo.badge'))}</span></p></div>`;
+  <tr class="tot"><td colspan="2">${esc(t('o.total'))}</td><td class="r">${money(o.total)}</td></tr></tbody></table><p style="text-align:center">${esc(t('o.thanks'))}${store.isDemo ? `<br><span class="stamp">${esc(t('demo.badge'))}</span>` : ''}</p></div>`;
 }
 
 // ---------- Menu manager ----------
@@ -190,7 +192,7 @@ function vBookings() {
     html: `<h1 class="view-title">${esc(t('nav.bookings'))} <small>${esc(t('b.guestsToday', { n: guests }))}</small></h1>
     <div class="pills">${Object.keys(filt).map((k) => `<button type="button" class="pill" data-act="resday" data-k="${k}" aria-pressed="${ui.resDay === k}">${esc(t(`b.${k}`))}<span class="n">${all.filter(filt[k]).length}</span></button>`).join('')}</div>
     ${list.length ? `<div class="list">${list.map((r) => `<article class="card bcard"><div class="flex between wrap"><div><strong class="btime">${esc(r.time)}</strong> <span class="muted small">${esc(fd(r.date, { weekday: 'short', day: 'numeric', month: 'short' }))}</span></div>${chip(r.status)}</div>
-      <div class="flex mt" style="margin-top:6px"><span class="grow"><strong>${esc(r.name)}</strong> · ${esc(t('b.guests', { n: r.guests }))}<br><span class="small muted">${esc(r.phone)}${r.note ? ` · ${esc(r.note)}` : ''}</span></span></div>
+      <div class="flex mt" style="margin-top:6px"><span class="grow"><strong>${esc(r.name)}</strong> · ${esc(t('b.guests', { n: r.guests }))}<br><span class="small muted">${esc(r.phone)}${r.note ? ` · ${esc(sampleText(r.note, i18n.lang))}` : ''}</span></span></div>
       <div class="btn-row mt">${r.status === 'pending' ? `<button type="button" class="btn sm primary" data-act="res" data-id="${r.id}" data-s="confirmed">${icon('check')}${esc(t('b.confirm'))}</button>` : ''}
       ${r.status === 'confirmed' ? `<button type="button" class="btn sm primary" data-act="res" data-id="${r.id}" data-s="seated">${esc(t('b.seat'))}</button>` : ''}
       <a class="btn sm wa" target="_blank" rel="noopener" href="${esc(waLink(r.phone, REST_APP_I18N[i18n.lang]['msg.booking'].replace('{name}', r.name.split(' ')[0]).replace('{r}', d().settings.name).replace('{date}', fd(r.date)).replace('{time}', r.time).replace('{n}', r.guests)))}">${icon('wa')}WhatsApp</a>
@@ -258,7 +260,8 @@ function vSettings() {
       <button class="btn primary big" type="submit">${esc(t('a.save'))}</button>
     </form>
     <section class="card mt"><div class="btn-grid"><button type="button" class="btn" data-act="backup">${icon('download')}${esc(t('set.backup'))}</button><button type="button" class="btn" data-act="restore">${icon('upload')}${esc(t('set.restore'))}</button><button type="button" class="btn" data-act="lock">${icon('lock')}${esc(t('set.lock'))}</button><button type="button" class="btn" id="install-btn" hidden>${icon('install')}${esc(t('set.install'))}</button></div>
-    <p class="small muted mt">${esc(t('set.dataHelp'))}</p><button type="button" class="btn danger block mt" data-act="reset">${icon('trash')}${esc(t('set.reset'))}</button></section>`,
+    <p class="small muted mt">${esc(t('set.dataHelp'))}</p></section>
+    ${dataStateCard({ store, t, fd })}`,
     mount() {
       i18n.mountSwitch($('#stf'));
       bindInstallButton($('#install-btn'));
@@ -295,6 +298,7 @@ const actions = {
   backup: () => download(`spiceroute-backup-${TODAY}.json`, store.exportJSON(), 'application/json'),
   restore: async () => { const f = await pickFile(); if (!f) return; try { store.importJSON(await readText(f)); toast(t('set.restored'), 'ok'); render(); } catch (e) { toast(e.message, 'danger'); } },
   reset: async () => { if (!(await confirmBox(t('set.resetQ'), { ok: t('set.reset'), cancel: t('a.cancel'), danger: true }))) return; store.reset(); location.hash = '#/'; render(); toast(t('set.resetDone'), 'ok'); },
+  'start-empty': async () => { if (await startEmptyFlow({ store, t })) { location.hash = '#/'; render(); } },
   lock: () => lockNow(REST_KEY),
 };
 document.addEventListener('click', (e) => {

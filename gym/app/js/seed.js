@@ -113,10 +113,35 @@ export function seedGym(today = todayISO()) {
     }
   });
   attendance.sort((a, b) => (a.d + a.t < b.d + b.t ? -1 : 1));
-  return { settings, counters: { member: members.length, receipt }, members, payments, attendance, seededFor: today };
+  return { settings, counters: { member: members.length, receipt }, members, payments, attendance, enquiries: seedEnquiries(today), seededFor: today };
 }
 
-export const GYM_STORE_VERSION = 2;
+/** Five clearly fictional free-trial enquiries (phone numbers start with 5, so nobody real can be called). */
+export function seedEnquiries(today = todayISO()) {
+  const rows = [
+    // [id, name, phone, goal, time, days ago, status]
+    ['EQS1', 'Jasmeet (sample)', '5012345601', 1, '3', 0, 'new'],
+    ['EQS2', 'Rahul (sample)', '5012345602', 2, '1', 1, 'new'],
+    ['EQS3', 'Navneet (sample)', '5012345603', 3, '3', 3, 'contacted'],
+    ['EQS4', 'Deepak (sample)', '5012345604', 4, '1', 6, 'joined'],
+    ['EQS5', 'Komal (sample)', '5012345605', 1, '2', 9, 'lost'],
+  ];
+  return rows.map(([id, name, phone, goal, time, ago, status]) => {
+    const date = addDays(today, -ago);
+    const history = [{ date, status: 'new' }];
+    if (status !== 'new') history.push({ date: addDays(date, 1), status: 'contacted' });
+    if (status === 'joined' || status === 'lost') history.push({ date: addDays(date, 2), status });
+    const last = history[history.length - 1];
+    return { id, name, phone, goal: `goal.${goal}`, time, date, status, statusDate: last.date, contactedDate: status === 'new' ? undefined : history[1].date, history, source: 'sample' };
+  });
+}
+
+/** "Start with an empty business": no members, payments, visits or enquiries — settings (plans, prices, rules, PIN) stay. */
+export function emptyGym(current) {
+  return { settings: { ...DEFAULT_SETTINGS, ...(current.settings || {}) }, counters: { member: 0, receipt: 0 }, members: [], payments: [], attendance: [], enquiries: [] };
+}
+
+export const GYM_STORE_VERSION = 3;
 export const gymMigrations = {
   // v1 stored a single `plan` + `expiry` on the member; v2 keeps a list of periods and reminder history.
   2: (d) => {
@@ -130,6 +155,11 @@ export const gymMigrations = {
     });
     d.settings = { ...DEFAULT_SETTINGS, ...(d.settings || {}) };
     d.counters = d.counters || { member: (d.members || []).length, receipt: (d.payments || []).length };
+    return d;
+  },
+  // v3 adds free-trial enquiries. Demo data gets the sample enquiries; a real business starts with none.
+  3: (d) => {
+    if (!Array.isArray(d.enquiries)) d.enquiries = d.__demo === false ? [] : seedEnquiries(todayISO());
     return d;
   },
 };

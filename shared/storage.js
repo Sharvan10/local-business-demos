@@ -21,7 +21,11 @@ export function migrate(data, version, migrations = {}) {
   return out;
 }
 
-export function createStore({ key, version, seed, migrations = {}, backend }) {
+/**
+ * @param empty optional (current) => data. Builds a clean business from the current data, keeping
+ *        settings (plans, prices, PIN…). Used by startEmpty() when a real client takes over the app.
+ */
+export function createStore({ key, version, seed, migrations = {}, backend, empty }) {
   const be = backend || (typeof localStorage !== 'undefined' ? localStorage : memoryBackend());
   let cache = null;
   const listeners = new Set();
@@ -56,6 +60,16 @@ export function createStore({ key, version, seed, migrations = {}, backend }) {
     save(data = cache) { write(data); },
     update(fn) { const d = load(); fn(d); write(d); return d; },
     reset() { write(fresh()); return cache; },
+    /** Delete the sample records but keep settings. The data is then marked as the owner's own (not demo). */
+    startEmpty() {
+      const cur = load();
+      const base = empty ? empty(JSON.parse(JSON.stringify(cur))) : { settings: cur.settings };
+      const d = { ...base, __v: version, __demo: false, __startedAt: new Date().toISOString() };
+      write(d);
+      return cache;
+    },
+    /** True while the app still holds the generated sample data. */
+    get isDemo() { return load().__demo !== false; },
     reload() { cache = null; return load(); },
     subscribe(fn) { listeners.add(fn); return () => listeners.delete(fn); },
     exportJSON() {

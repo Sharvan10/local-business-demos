@@ -201,3 +201,54 @@ export function monthlyCollection(payments, today, count = 6) {
   }
   return out;
 }
+
+// ---- Free-trial enquiries (from the public website form) ----
+// Flow: New → Contacted → Joined / Not interested. Any status can be set again by hand (people change their mind).
+export const ENQ_STATUS = ['new', 'contacted', 'joined', 'lost'];
+
+/** Change an enquiry's status (pure). Records when it happened; 'joined' can carry the new member's ID. */
+export function setEnquiryStatus(enq, status, today, memberId) {
+  if (!ENQ_STATUS.includes(status)) throw new Error(`Unknown enquiry status: ${status}`);
+  if (enq.status === status && (!memberId || enq.memberId === memberId)) return enq;
+  const out = { ...enq, status, statusDate: today, history: [...(enq.history || []), { date: today, status }] };
+  if (status === 'contacted' && !out.contactedDate) out.contactedDate = today;
+  if (status === 'joined' && memberId) out.memberId = memberId;
+  if (status !== 'joined') delete out.memberId;
+  return out;
+}
+
+/** Calling or WhatsApp-ing a new enquiry moves it to "Contacted"; other statuses are left alone. */
+export function afterContact(enq, today) { return enq.status === 'new' ? setEnquiryStatus(enq, 'contacted', today) : enq; }
+
+/** Indian mobile as 10 digits: drops spaces, +91 / 91 / 0 prefixes. Anything else is returned as typed. */
+export function cleanPhone(p) {
+  const d = String(p || '').replace(/\D/g, '');
+  if (d.length === 12 && d.startsWith('91')) return d.slice(2);
+  if (d.length === 11 && d.startsWith('0')) return d.slice(1);
+  return d.length === 10 ? d : String(p || '').trim();
+}
+
+/** What the Add Member form is pre-filled with when an enquiry is converted. `goalText` is the translated goal. */
+export function enquiryPrefill(enq, goalText = '', label = 'Free trial enquiry') {
+  return { name: String(enq.name || '').trim(), phone: cleanPhone(enq.phone), notes: goalText ? `${label} · ${goalText}` : label, enquiryId: enq.id };
+}
+
+/** Bring new website-form entries into the app's list (each once). Site entries look like {name, phone, goal, goalKey?, time, at}. */
+export function importSiteEnquiries(list, siteEntries, today) {
+  const seen = new Set(list.map((e) => e.siteAt).filter(Boolean));
+  const added = [];
+  for (const s of siteEntries || []) {
+    if (!s || !s.name || !s.at || seen.has(s.at)) continue;
+    seen.add(s.at);
+    const dt = new Date(s.at);
+    const date = Number.isNaN(dt.getTime()) ? today : `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`;
+    added.push({ id: `EQ${String(s.at).replace(/\D/g, '').slice(2, 14)}${added.length}`, name: String(s.name).trim(), phone: String(s.phone || '').trim(), goal: s.goalKey ? `goal.${s.goalKey}` : (s.goal || ''), time: s.time || '', date, status: 'new', source: 'web', siteAt: s.at, history: [{ date, status: 'new' }] });
+  }
+  return { list: [...added.reverse(), ...list], added: added.length };
+}
+
+export function enquiryCounts(list) {
+  const c = { all: list.length, new: 0, contacted: 0, joined: 0, lost: 0 };
+  list.forEach((e) => { c[e.status] = (c[e.status] || 0) + 1; });
+  return c;
+}

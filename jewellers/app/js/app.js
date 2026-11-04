@@ -7,6 +7,7 @@ import { icon } from '../../../shared/icons.js';
 import { barChart } from '../../../shared/chart.js';
 import { pinGate, lockNow } from '../../../shared/pin.js';
 import { registerPWA, bindInstallButton } from '../../../shared/pwa.js';
+import { paintDataStrip, dataStateCard, startEmptyFlow } from '../../../shared/demo-mode.js';
 import { JEW_APP_I18N } from '../../../js/i18n-jewellers-app.js';
 import { jewStore as store, JEW_KEY, JCATS, jName, itemArt } from '../../js/data.js';
 import { priceBreakup, PURITIES, schemeStatus, ledgerBalance, JOB_STATUSES, jobLate, occasions } from '../../js/logic.js';
@@ -35,6 +36,7 @@ function render() {
   const out = (views[name] || vHome)();
   view.innerHTML = out.html;
   $('#fab').outerHTML = out.fab || '<a id="fab" class="fab" hidden></a>';
+  paintDataStrip(store.isDemo, t);
   $('#brand-name').textContent = d().settings.name;
   $('#brand-sub').textContent = fd(TODAY, { weekday: 'long', day: 'numeric', month: 'long' });
   if (out.mount) out.mount();
@@ -80,6 +82,7 @@ function vHome() {
       const f = $('#rate-form');
       const sample = d().items.find((i) => i.id === 'g-chain-01') || d().items[0];
       const prev = () => {
+        if (!sample) { $('#rate-preview').textContent = ''; return; } // no stock yet (empty business)
         const v = formData(f);
         const nr = Object.fromEntries(Object.entries(v).map(([k, x]) => [k, Number(x) || 0]));
         const a = price(sample).total, b = priceBreakup(sample, nr, d().settings.gstPct).total;
@@ -366,7 +369,8 @@ function vSettings() {
     <div class="field"><span class="lbl">${esc(t('set.lang'))}</span><div class="lang-switch"></div></div>
     <button class="btn primary big" type="submit">${esc(t('a.save'))}</button></form>
     <section class="card mt"><div class="btn-grid"><button type="button" class="btn" data-act="backup">${icon('download')}${esc(t('set.backup'))}</button><button type="button" class="btn" data-act="restore">${icon('upload')}${esc(t('set.restore'))}</button><button type="button" class="btn" data-act="lock">${icon('lock')}${esc(t('set.lock'))}</button><button type="button" class="btn" id="install-btn" hidden>${icon('install')}${esc(t('set.install'))}</button></div>
-    <p class="small muted mt">${esc(t('set.dataHelp'))}</p><button type="button" class="btn danger block mt" data-act="reset">${icon('trash')}${esc(t('set.reset'))}</button></section>`,
+    <p class="small muted mt">${esc(t('set.dataHelp'))}</p></section>
+    ${dataStateCard({ store, t, fd })}`,
     mount() {
       i18n.mountSwitch($('#stf'));
       bindInstallButton($('#install-btn'));
@@ -394,6 +398,7 @@ const actions = {
   backup: () => download(`shreeheera-backup-${TODAY}.json`, store.exportJSON(), 'application/json'),
   restore: async () => { const f = await pickFile(); if (!f) return; try { store.importJSON(await readText(f)); toast(t('set.restored'), 'ok'); render(); } catch (e) { toast(e.message, 'danger'); } },
   reset: async () => { if (!(await confirmBox(t('set.resetQ'), { ok: t('set.reset'), cancel: t('a.cancel'), danger: true }))) return; store.reset(); location.hash = '#/'; render(); toast(t('set.resetDone'), 'ok'); },
+  'start-empty': async () => { if (await startEmptyFlow({ store, t })) { location.hash = '#/'; render(); } },
   lock: () => lockNow(JEW_KEY),
 };
 document.addEventListener('click', (e) => {
