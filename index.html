@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Local Business Demos · Punjab</title>
+<meta name="description" content="Portfolio of three fictional local-business demos for Punjab: a gym, a restaurant and a jeweller — each with a public website and an offline owner app.">
+<meta name="theme-color" content="#101114">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101114'/%3E%3Cpath d='M9 22V10h4l3 6 3-6h4v12' fill='none' stroke='%23f2b632' stroke-width='3'/%3E%3C/svg%3E">
+<link rel="preload" href="shared/fonts/inter-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="shared/fonts.css">
+<link rel="stylesheet" href="shared/tokens.css">
+<style>
+:root{--c-bg:#f6f4ef;--c-text:#15161a;--c-muted:#5c5f68;--c-accent:#15161a;--c-accent-ink:#fff;--c-card:#fff;--c-line:#e4e0d6}
+body{background:var(--c-bg)}
+.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0}
+.mark{display:flex;align-items:center;gap:10px;font-weight:800;text-decoration:none;color:inherit}
+.mark i{width:30px;height:30px;border-radius:9px;background:conic-gradient(#c6ff3d,#e8902b,#7a1f12,#c9a24a,#c6ff3d)}
+.hero{padding:40px 0 30px}
+.kicker{font-size:13px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#9a6b12;margin:0 0 12px}
+h1{font-size:clamp(34px,6vw,62px);line-height:1.05;letter-spacing:-.02em;font-weight:800;max-width:900px;margin:0 0 16px}
+.lead{font-size:18px;color:var(--c-muted);max-width:720px}
+.note{display:inline-flex;gap:8px;align-items:center;font-size:13.5px;background:#fff6d6;border:1px solid #f1e0a0;padding:6px 12px;border-radius:999px}
+.cards{display:grid;gap:18px;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));padding:20px 0 50px}
+.card{background:var(--c-card);border:1px solid var(--c-line);border-radius:24px;overflow:hidden;display:flex;flex-direction:column;transition:transform .3s var(--ease),box-shadow .3s}
+.card:hover{transform:translateY(-4px);box-shadow:0 24px 50px -30px rgba(0,0,0,.35)}
+.prev{position:relative;height:190px;display:flex;align-items:flex-end;padding:18px;color:#fff;overflow:hidden}
+.prev .tag{position:absolute;top:14px;left:14px;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;background:rgba(255,255,255,.16);backdrop-filter:blur(4px)}
+.prev strong{font-size:26px;line-height:1.1;position:relative}
+.gym .prev{background:radial-gradient(circle at 80% 20%,rgba(198,255,61,.35),transparent 50%),linear-gradient(135deg,#0c0e12,#1d222b)}
+.gym .prev strong{font-family:'Bebas Neue',sans-serif;font-size:42px;font-weight:400;letter-spacing:.03em;color:#c6ff3d}
+.rest .prev{background:radial-gradient(circle at 80% 20%,rgba(242,182,50,.55),transparent 55%),linear-gradient(135deg,#7a1f12,#a8321b)}
+.rest .prev strong{font-family:'Fraunces',serif;font-style:italic;font-weight:400;font-size:34px;color:#ffe2a6}
+.jew .prev{background:radial-gradient(circle at 80% 20%,rgba(227,193,120,.4),transparent 55%),linear-gradient(135deg,#2e0710,#5a0f1e)}
+.jew .prev strong{font-family:'Cormorant Garamond',serif;font-weight:600;font-size:36px;color:#f4e2b0}
+.deco{position:absolute;right:12px;top:12px;width:104px;opacity:.85}
+.prev .tag{z-index:1}
+.body{padding:18px 20px 20px;display:flex;flex-direction:column;gap:14px;flex:1}
+.body p{margin:0;color:var(--c-muted)}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:auto}
+.links a{display:flex;flex-direction:column;justify-content:center;min-height:56px;padding:8px 14px;border-radius:14px;text-decoration:none;font-weight:700;border:1px solid var(--c-line)}
+.links a small{font-weight:500;color:var(--c-muted);font-size:12px}
+.links a.primary{background:#15161a;color:#fff;border-color:transparent}
+.links a.primary small{color:#c9cbd1}
+.pitch{padding:50px 0;border-top:1px solid var(--c-line)}
+.pitch h2{font-size:clamp(28px,4vw,40px);letter-spacing:-.01em;margin-bottom:22px}
+.grid5{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr))}
+.grid5 div{background:#fff;border:1px solid var(--c-line);border-radius:18px;padding:18px}
+.grid5 strong{display:block;margin-bottom:6px}
+.grid5 span{color:var(--c-muted);font-size:14.5px}
+.tech{margin-top:26px;font-size:14px;color:var(--c-muted)}
+.tip{margin-top:10px;font-size:14px}
+footer{padding:30px 0 50px;color:var(--c-muted);font-size:14px;border-top:1px solid var(--c-line)}
+</style>
+</head>
+<body>
+<a class="skip-link" href="#main" data-i18n="skip">Skip to content</a>
+<div class="container top"><a class="mark" href="./"><i aria-hidden="true"></i>Local Business Demos</a><div class="lang-switch"></div></div>
+<main id="main" class="container">
+  <section class="hero">
+    <p class="kicker" data-i18n="kicker">Local business demos · Punjab</p>
+    <h1 data-i18n="h1">A website your customers love. An app that runs your day.</h1>
+    <p class="lead" data-i18n="lead">Three working demos for local businesses — a gym, a restaurant and a jeweller.</p>
+    <p class="note"><span class="demo-badge">DEMO</span><span data-i18n="fictional">All businesses, people and numbers here are fictional sample data.</span></p>
+  </section>
+  <section class="cards" aria-label="Demos">
+    <article class="card gym"><div class="prev"><span class="tag" data-i18n="gym.tag">Gym &amp; fitness</span><strong data-i18n="gym.t">IronCore Fitness Club</strong><svg class="deco" viewBox="0 0 120 120" aria-hidden="true"><path d="M38 52c0-30 44-30 44 0" fill="none" stroke="#2a2f38" stroke-width="12"/><circle cx="60" cy="82" r="34" fill="#2a2f38"/><rect x="34" y="76" width="52" height="12" rx="3" fill="#c6ff3d"/></svg></div>
+      <div class="body"><p data-i18n="gym.d"></p><div class="links"><a class="primary" href="gym/"><span data-i18n="site">Public website</span><small>/gym/</small></a><a href="gym/app/"><span data-i18n="app">Owner app</span><small data-i18n="pin">Demo PIN 1234</small></a></div></div></article>
+    <article class="card rest"><div class="prev"><span class="tag" data-i18n="rest.tag">Restaurant</span><strong data-i18n="rest.t">Spice Route Rasoi</strong><svg class="deco" viewBox="0 0 120 120" aria-hidden="true"><circle cx="66" cy="70" r="46" fill="#fbf4e8"/><circle cx="66" cy="70" r="30" fill="#c8682c"/><circle cx="58" cy="62" r="4" fill="#fff6dc"/><circle cx="74" cy="78" r="4" fill="#3f7d2a"/></svg></div>
+      <div class="body"><p data-i18n="rest.d"></p><div class="links"><a class="primary" href="restaurant/"><span data-i18n="site">Public website</span><small>/restaurant/</small></a><a href="restaurant/app/"><span data-i18n="app">Owner app</span><small data-i18n="pin">Demo PIN 1234</small></a></div></div></article>
+    <article class="card jew"><div class="prev"><span class="tag" data-i18n="jew.tag">Jewellers</span><strong data-i18n="jew.t">Shree Heera Jewellers</strong><svg class="deco" viewBox="0 0 120 120" aria-hidden="true"><defs><linearGradient id="hg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#f4e2b0"/><stop offset="1" stop-color="#b8862b"/></linearGradient></defs><ellipse cx="62" cy="78" rx="34" ry="30" fill="none" stroke="url(#hg)" stroke-width="10"/><path d="M50 50l12-16 12 16-12 10z" fill="#e9f6ff"/></svg></div>
+      <div class="body"><p data-i18n="jew.d"></p><div class="links"><a class="primary" href="jewellers/"><span data-i18n="site">Public website</span><small>/jewellers/</small></a><a href="jewellers/app/"><span data-i18n="app">Owner app</span><small data-i18n="pin">Demo PIN 1234</small></a></div></div></article>
+  </section>
+  <section class="pitch">
+    <h2 data-i18n="pitch.h">What a client gets</h2>
+    <div class="grid5">
+      <div><strong data-i18n="p1.t"></strong><span data-i18n="p1.d"></span></div><div><strong data-i18n="p2.t"></strong><span data-i18n="p2.d"></span></div><div><strong data-i18n="p3.t"></strong><span data-i18n="p3.d"></span></div><div><strong data-i18n="p4.t"></strong><span data-i18n="p4.d"></span></div><div><strong data-i18n="p5.t"></strong><span data-i18n="p5.d"></span></div>
+    </div>
+    <p class="tech"><strong data-i18n="tech">Built with</strong>: <span data-i18n="techList"></span></p>
+    <p class="tip" data-i18n="how"></p>
+  </section>
+</main>
+<footer><div class="container" data-i18n="foot">Demo portfolio by a freelance web developer. Fictional businesses only.</div></footer>
+<script type="module">
+import { createI18n } from './shared/i18n.js';
+import { HUB_I18N } from './js/i18n-hub.js';
+createI18n(HUB_I18N).mountSwitch();
+</script>
+</body>
+</html>
