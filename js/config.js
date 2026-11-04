@@ -3,6 +3,9 @@
 export const CONFIG = {
   WHATSAPP_NUMBER: 'PASTE_NUMBER',
   CONTACT_EMAIL: 'PASTE_EMAIL',
+  // Optional: street address text and a Google Maps share link (https://maps.app.goo.gl/...)
+  ADDRESS: 'PASTE_ADDRESS',
+  MAPS_URL: 'PASTE_MAPS_URL',
   // Optional per-site overrides, e.g. gym: { WHATSAPP_NUMBER: '91...' }
   sites: { gym: {}, restaurant: {}, jewellers: {} },
 };
@@ -23,5 +26,11 @@ export function applyConfig(site, root = document) {
     if (!v) { el.hidden = true; return; }
     el.textContent = v;
     if (el.tagName === 'A' && el.dataset.fill === 'CONTACT_EMAIL') el.href = `mailto:${v}`;
+  });
+  root.querySelectorAll('[data-href]').forEach((el) => {
+    const v = cfg(el.dataset.href, site);
+    if (!v) { el.hidden = true; return; }
+    if (el.dataset.href === 'MAPS_URL') el.href = v;
+    if (el.dataset.href === 'WHATSAPP_NUMBER') el.href = `tel:+${v.replace(/\D/g, '')}`;
   });
 }

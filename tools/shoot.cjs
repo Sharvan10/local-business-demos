@@ -14,7 +14,7 @@ const path = require('path');
   let errors = 0;
   for (const w of widths) {
     for (const lang of langs) {
-      const ctx = await browser.newContext({ viewport: { width: w, height: w < 700 ? 780 : 860 }, deviceScaleFactor: 1, serviceWorkers: 'block' });
+      const ctx = await browser.newContext({ viewport: { width: w, height: w < 700 ? 780 : 860 }, deviceScaleFactor: 1, serviceWorkers: 'block', reducedMotion: process.env.FULL ? 'reduce' : 'no-preference' });
       await ctx.addInitScript(([l, k]) => { try { localStorage.setItem('lbd.lang', l); if (k) sessionStorage.setItem(`${k}.unlocked`, '1'); } catch (e) {} }, [lang, unlock]);
       const page = await ctx.newPage();
       page.on('console', (m) => { if (m.type() === 'error') { errors++; console.log(`[console ${w} ${lang}]`, m.text()); } });
