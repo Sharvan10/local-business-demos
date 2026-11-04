@@ -26,7 +26,8 @@ export function barChart(data, { height = 190, format = (v) => v, highlightLast 
       + (d.value > 0 ? `<text class="bar-val" x="${(x + bw / 2).toFixed(1)}" y="${(y - 7).toFixed(1)}" text-anchor="middle">${esc(shortNum(d.value))}</text>` : '')
       + `<text class="bar-lbl" x="${(x + bw / 2).toFixed(1)}" y="${height - 9}" text-anchor="middle">${esc(d.label)}</text></g>`;
   }).join('');
-  return `<svg class="chart" viewBox="0 0 ${w} ${height}" role="img" aria-label="${esc(ariaLabel)}" preserveAspectRatio="xMidYMid meet"><line class="axis" x1="0" x2="${w}" y1="${padT + plotH}" y2="${padT + plotH}"/>${bars}</svg>`;
+  const small = data.length > 8 ? ' style="font-size:9px"' : '';
+  return `<svg class="chart"${small} viewBox="0 0 ${w} ${height}" role="img" aria-label="${esc(ariaLabel)}" preserveAspectRatio="xMidYMid meet"><line class="axis" x1="0" x2="${w}" y1="${padT + plotH}" y2="${padT + plotH}"/>${bars}</svg>`;
 }
 
 /** Horizontal bars (best sellers, plan mix). */

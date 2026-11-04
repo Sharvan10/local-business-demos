@@ -194,7 +194,8 @@ dialog.sheet::backdrop{background:rgba(0,0,0,.55);backdrop-filter:blur(2px)}
 .chart .bar{fill:color-mix(in srgb,var(--accent) 45%,var(--surface-2))}
 .chart .bar.hi{fill:var(--accent)}
 .chart .bar-val{font-size:11px;fill:var(--text);font-weight:700}
-.chart .bar-lbl{font-size:11px;fill:var(--muted)}
+.chart .bar-lbl{font-size:inherit;fill:var(--muted)}
+.chart{font-size:11px}
 .chart .axis{stroke:var(--line)}
 .hbars{display:flex;flex-direction:column;gap:10px}
 .hbar{display:grid;grid-template-columns:minmax(0,1.3fr) 2fr auto;gap:10px;align-items:center;font-size:14px}

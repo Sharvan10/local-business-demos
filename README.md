@@ -103,7 +103,7 @@ The owner enters today's **gold 24K/22K/18K (per 10 g) and silver (per kg)** rat
 2. Edit **`js/config.js`**: paste the client's WhatsApp number (with country code, e.g. `9198…`), email, address and Google Maps link. Anything still starting with `PASTE_` is hidden automatically — no placeholder text ever shows. Until a number is set, WhatsApp buttons open WhatsApp's contact picker with the message ready.
 3. Change the business name and texts in `js/i18n-<site>.js` (all three languages sit side by side), and the colours in `<demo>/css/site.css` and `<demo>/app/css/app.css`.
 4. Replace the illustrations with real photos (restaurant and jeweller items already accept a photo URL in the owner app).
-5. In the owner app: Settings → set real plans/prices/PIN, then **Reset demo data** is *not* what you want — instead start fresh by clearing the browser storage once or importing a prepared JSON backup.
+5. To start a real client with **no sample data**, make the demo's seed function (`gym/app/js/seed.js` → `seedGym`, `restaurant/js/data.js` → `seedRestaurant`, `jewellers/js/data.js` → `seedJewellers`) return empty lists and remove the “Demo data” strip; then set real plans/prices/PIN in Settings.
 6. Regenerate icons with `node tools/make-icons.cjs` after changing colours/initials.
 
 ### What “demo data” means

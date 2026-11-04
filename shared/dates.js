@@ -69,7 +69,7 @@ function formatPa(s, opts) {
   if (opts.weekday) parts.push((opts.weekday === 'narrow' ? PA_DAYS_NARROW : PA_DAYS)[weekday(s)] + (opts.day || opts.month ? ',' : ''));
   if (opts.day) parts.push(String(d));
   if (opts.month) parts.push(PA_MONTHS[m - 1]);
-  if (opts.year) parts.push(opts.year === '2-digit' ? `'${String(y).slice(2)}` : String(y));
+  if (opts.year && opts.year !== '2-digit') parts.push(String(y)); // short month labels (charts) omit the year to save space
   return parts.join(' ');
 }
 export function formatDate(s, lang = 'en', opts = { day: 'numeric', month: 'short', year: 'numeric' }) {

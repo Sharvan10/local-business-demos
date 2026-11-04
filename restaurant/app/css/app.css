@@ -16,8 +16,9 @@
 .onote{margin:0 0 4px;font-size:13.5px;color:var(--warn)}
 .ometa{display:flex;justify-content:space-between;gap:10px;color:var(--muted);font-size:14px}
 .ometa strong{color:var(--text);font-size:17px}
-.oact{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
-.oact .btn{flex:1 1 140px}
+.oact{display:flex;gap:6px;margin-top:10px}
+.oact .btn{flex:1 1 0;min-width:0;padding:0 10px;font-size:14px}
+.oact .icon-btn{width:40px}
 .mrow .main.linkish{background:none;border:0;padding:0;text-align:left;color:inherit;min-width:0}
 .mrow .t{display:flex!important;align-items:center;gap:6px}
 .mrow.is-off{opacity:.55}
