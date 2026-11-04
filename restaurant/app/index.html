@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spice Route Owner App (Demo)</title>
+<meta name="description" content="Demo owner app for a fictional restaurant: orders, menu, bookings, sales. Works offline.">
+<meta name="theme-color" content="#1a0f0b">
+<meta name="robots" content="noindex">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="preload" href="../../shared/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../../shared/fonts.css">
+<link rel="stylesheet" href="../../shared/tokens.css">
+<link rel="stylesheet" href="../../shared/app.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<a class="skip-link" href="#view">Skip to content</a>
+<header class="app-head">
+  <a class="brand" href="#/">
+    <span class="brand-mark" aria-hidden="true">SR</span>
+    <span class="brand-txt"><span class="brand-name" id="brand-name">Spice Route</span><span class="brand-sub" id="brand-sub"></span></span>
+  </a>
+  <div class="lang-switch"></div>
+  <a class="icon-btn" href="#/settings" data-i18n-attr="aria-label:nav.settings" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></a>
+</header>
+<div class="demo-strip"><span class="demo-badge" data-i18n="demo.badge">Demo data</span><span data-i18n="demo.strip">Demo owner app with fictional sample data.</span><a href="../" data-i18n="demo.site">View website</a></div>
+<main id="view" class="view" tabindex="-1"><noscript>This app needs JavaScript.</noscript></main>
+<a id="fab" class="fab" hidden></a>
+<nav id="nav" class="bottom-nav" aria-label="Main"></nav>
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
