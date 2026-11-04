@@ -1,0 +1,32 @@
+/* Shree Heera owner app: deep maroon with gold */
+:root{
+  --bg:#170810;--surface:#240d17;--surface-2:#31141f;--line:rgba(227,193,120,.12);
+  --text:#fbf1e2;--muted:#c9a9a6;--accent:#e3c178;--accent-ink:#2b1016;--accent-2:#c9a24a;
+  --font-display:'Cormorant Garamond','Noto Sans Devanagari','Noto Sans Gurmukhi',serif;
+  --c-focus:#e3c178;--c-accent:#e3c178;--c-accent-ink:#2b1016;
+}
+.view-title{font-weight:600;font-size:30px}
+html:lang(hi) .view-title,html:lang(pa) .view-title{font-size:24px;font-weight:700}
+.app-head .brand-mark,.pin-logo{background:linear-gradient(135deg,#f4e2b0,#c9a24a);color:#4a0d1a}
+.stat .v{font-family:var(--font-body)}
+.stat.hero{background:radial-gradient(120% 140% at 100% 0%,rgba(227,193,120,.25),transparent 55%),var(--surface)}
+.stat.hero .v{color:var(--accent)}
+.rate-form{border-color:rgba(227,193,120,.35);background:linear-gradient(160deg,rgba(227,193,120,.08),var(--surface) 50%)}
+.rate-form input{font-size:20px!important;font-weight:700;font-variant-numeric:tabular-nums}
+.big-num{font-size:28px;font-weight:800;color:var(--accent);font-variant-numeric:tabular-nums}
+.jthumb{width:52px;height:52px;flex:none;border-radius:12px;background:radial-gradient(circle,#fffaf0,#e9dcc0);display:grid;place-items:center;overflow:hidden}
+.jthumb svg,.jthumb img{width:90%;height:90%;object-fit:contain}
+.linkish{background:none;border:0;padding:0;text-align:left;color:inherit;min-width:0;display:flex;flex-direction:column;width:100%}
+.row .main.linkish{flex:1}
+.row.is-off{opacity:.55}
+.item-hero{display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.item-hero svg,.item-hero img{width:110px;height:110px;flex:none;border-radius:16px;background:radial-gradient(circle,#fffaf0,#e9dcc0)}
+.occ-ic{font-size:26px;width:42px;text-align:center}
+.sch-row{padding:12px 14px}
+.sch-row .progress{display:block;margin:8px 0 4px}
+.sch-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.sch-grid span{aspect-ratio:1;display:grid;place-items:center;border-radius:10px;background:var(--surface-2);font-weight:700;color:var(--muted)}
+.sch-grid span.on{background:var(--accent);color:var(--accent-ink)}
+.sch-grid span.late{background:var(--danger-bg);color:var(--danger)}
+.sch-grid span.bonus{background:rgba(227,193,120,.15)}
+.chip.accent{background:rgba(227,193,120,.16);color:var(--accent)}

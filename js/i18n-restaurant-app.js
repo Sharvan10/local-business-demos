@@ -2,7 +2,7 @@
 const en = {
   'demo.badge': 'Demo data', 'demo.strip': 'Demo owner app with fictional sample data.', 'demo.site': 'View website',
   'pin.title': 'Enter PIN', 'pin.delete': 'Delete', 'pin.enter': 'Unlock', 'pin.wrong': 'Wrong PIN, try again', 'pin.hint': 'Demo PIN:',
-  'nav.orders': 'Orders', 'nav.menu': 'Menu', 'nav.bookings': 'Bookings', 'nav.sales': 'Sales', 'nav.more': 'More',
+  'nav.orders': 'Orders', 'nav.menu': 'Menu', 'nav.bookings': 'Bookings', 'nav.sales': 'Sales', 'nav.more': 'More', 'nav.settings': 'Settings',
   'st.new': 'New', 'st.preparing': 'Preparing', 'st.ready': 'Ready', 'st.delivered': 'Delivered', 'st.cancelled': 'Cancelled',
   'st.pending': 'Pending', 'st.confirmed': 'Confirmed', 'st.seated': 'Seated', 'st.noshow': 'No-show',
   'type.delivery': 'Delivery', 'type.pickup': 'Pickup', 'type.dine-in': 'Dine-in',
@@ -33,7 +33,7 @@ const en = {
 const hi = {
   'demo.badge': 'डेमो डेटा', 'demo.strip': 'काल्पनिक नमूना डेटा वाला डेमो ऐप।', 'demo.site': 'वेबसाइट देखें',
   'pin.title': 'PIN डालें', 'pin.delete': 'मिटाएँ', 'pin.enter': 'खोलें', 'pin.wrong': 'गलत PIN, फिर से कोशिश करें', 'pin.hint': 'डेमो PIN:',
-  'nav.orders': 'ऑर्डर', 'nav.menu': 'मेन्यू', 'nav.bookings': 'बुकिंग', 'nav.sales': 'बिक्री', 'nav.more': 'और',
+  'nav.orders': 'ऑर्डर', 'nav.menu': 'मेन्यू', 'nav.bookings': 'बुकिंग', 'nav.sales': 'बिक्री', 'nav.more': 'और', 'nav.settings': 'सेटिंग्स',
   'st.new': 'नया', 'st.preparing': 'बन रहा है', 'st.ready': 'तैयार', 'st.delivered': 'दे दिया', 'st.cancelled': 'रद्द',
   'st.pending': 'बाकी', 'st.confirmed': 'पक्का', 'st.seated': 'बैठ गए', 'st.noshow': 'नहीं आए',
   'type.delivery': 'डिलीवरी', 'type.pickup': 'पिकअप', 'type.dine-in': 'यहीं खाना',
@@ -64,7 +64,7 @@ const hi = {
 const pa = {
   'demo.badge': 'ਡੈਮੋ ਡਾਟਾ', 'demo.strip': 'ਕਾਲਪਨਿਕ ਨਮੂਨਾ ਡਾਟਾ ਵਾਲੀ ਡੈਮੋ ਐਪ।', 'demo.site': 'ਵੈੱਬਸਾਈਟ ਵੇਖੋ',
   'pin.title': 'PIN ਪਾਓ', 'pin.delete': 'ਮਿਟਾਓ', 'pin.enter': 'ਖੋਲ੍ਹੋ', 'pin.wrong': 'ਗਲਤ PIN, ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ', 'pin.hint': 'ਡੈਮੋ PIN:',
-  'nav.orders': 'ਆਰਡਰ', 'nav.menu': 'ਮੀਨੂ', 'nav.bookings': 'ਬੁਕਿੰਗ', 'nav.sales': 'ਵਿਕਰੀ', 'nav.more': 'ਹੋਰ',
+  'nav.orders': 'ਆਰਡਰ', 'nav.menu': 'ਮੀਨੂ', 'nav.bookings': 'ਬੁਕਿੰਗ', 'nav.sales': 'ਵਿਕਰੀ', 'nav.more': 'ਹੋਰ', 'nav.settings': 'ਸੈਟਿੰਗਾਂ',
   'st.new': 'ਨਵਾਂ', 'st.preparing': 'ਬਣ ਰਿਹਾ', 'st.ready': 'ਤਿਆਰ', 'st.delivered': 'ਦੇ ਦਿੱਤਾ', 'st.cancelled': 'ਰੱਦ',
   'st.pending': 'ਬਾਕੀ', 'st.confirmed': 'ਪੱਕੀ', 'st.seated': 'ਬੈਠ ਗਏ', 'st.noshow': 'ਨਹੀਂ ਆਏ',
   'type.delivery': 'ਡਿਲਿਵਰੀ', 'type.pickup': 'ਪਿਕਅੱਪ', 'type.dine-in': 'ਇੱਥੇ ਖਾਣਾ',

@@ -59,8 +59,22 @@ export function msUntilNextMidnight(now = new Date()) {
   const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, 0, 0, 1);
   return next - now;
 }
+const PA_MONTHS = ['ਜਨਵਰੀ', 'ਫ਼ਰਵਰੀ', 'ਮਾਰਚ', 'ਅਪ੍ਰੈਲ', 'ਮਈ', 'ਜੂਨ', 'ਜੁਲਾਈ', 'ਅਗਸਤ', 'ਸਤੰਬਰ', 'ਅਕਤੂਬਰ', 'ਨਵੰਬਰ', 'ਦਸੰਬਰ'];
+const PA_DAYS = ['ਐਤਵਾਰ', 'ਸੋਮਵਾਰ', 'ਮੰਗਲਵਾਰ', 'ਬੁੱਧਵਾਰ', 'ਵੀਰਵਾਰ', 'ਸ਼ੁੱਕਰਵਾਰ', 'ਸ਼ਨੀਵਾਰ'];
+const PA_DAYS_NARROW = ['ਐ', 'ਸੋ', 'ਮੰ', 'ਬੁੱ', 'ਵੀ', 'ਸ਼ੁੱ', 'ਸ਼'];
+/** Punjabi month/day names are built in, because many browsers ship without full Gurmukhi locale data. */
+function formatPa(s, opts) {
+  const { y, m, d } = parseISO(s);
+  const parts = [];
+  if (opts.weekday) parts.push((opts.weekday === 'narrow' ? PA_DAYS_NARROW : PA_DAYS)[weekday(s)] + (opts.day || opts.month ? ',' : ''));
+  if (opts.day) parts.push(String(d));
+  if (opts.month) parts.push(PA_MONTHS[m - 1]);
+  if (opts.year) parts.push(opts.year === '2-digit' ? `'${String(y).slice(2)}` : String(y));
+  return parts.join(' ');
+}
 export function formatDate(s, lang = 'en', opts = { day: 'numeric', month: 'short', year: 'numeric' }) {
   if (!s) return '';
+  if (lang === 'pa') return formatPa(s, opts);
   try { return new Intl.DateTimeFormat(LOCALES[lang] || 'en-IN', { ...opts, timeZone: 'UTC' }).format(new Date(toUTC(s))); }
   catch { return s; }
 }

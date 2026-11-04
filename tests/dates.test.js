@@ -58,3 +58,10 @@ test('todayISO uses the local calendar day', () => {
   assert.equal(D.todayISO(new Date(2026, 10, 5, 0, 0)), '2026-11-05');
   assert.ok(D.msUntilNextMidnight(new Date(2026, 10, 4, 23, 59, 0)) <= 61000);
 });
+
+test('Punjabi dates use built-in Gurmukhi names', () => {
+  assert.equal(D.formatDate('2026-11-04', 'pa'), '4 ਨਵੰਬਰ 2026');
+  assert.equal(D.formatDate('2026-11-04', 'pa', { weekday: 'long', day: 'numeric', month: 'long' }), 'ਬੁੱਧਵਾਰ, 4 ਨਵੰਬਰ');
+  assert.equal(D.formatMonth('2026-11', 'pa'), "ਨਵੰਬਰ '26");
+  assert.equal(D.formatDate('2026-11-04', 'en'), '4 Nov 2026');
+});
