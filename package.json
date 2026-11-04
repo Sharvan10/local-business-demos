@@ -1,0 +1,12 @@
+{
+  "name": "local-business-demos",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Three fictional Punjab local-business demos (gym, restaurant, jewellers): public sites + offline owner PWAs. Plain HTML/CSS/JS, no build step.",
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "serve": "python3 -m http.server 8080"
+  },
+  "license": "MIT"
+}
