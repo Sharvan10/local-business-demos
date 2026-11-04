@@ -7,7 +7,7 @@ A portfolio of **three fictional local-business demos** for Punjab, India. Each 
 
 | Demo | Public site | Owner app (demo PIN **1234**) | What the app does |
 |---|---|---|---|
-| **IronCore Fitness Club** (gym) | `/gym/` | `/gym/app/` | Members, fees and receipts, renewals with partial payments and late fees, freezes, attendance, WhatsApp reminder queues, reports, CSV export |
+| **IronCore Fitness Club** (gym) | `/gym/` | `/gym/app/` | Free-trial enquiries from the website, members, fees and receipts, renewals with partial payments and late fees, freezes, attendance, WhatsApp reminder queues, reports, CSV export |
 | **Spice Route Rasoi** (restaurant) | `/restaurant/` | `/restaurant/app/` | Orders board (website cart → kitchen), menu manager, table bookings, KOT and bill printing, sales charts, customers, menu QR code |
 | **Shree Heera Jewellers** | `/jewellers/` | `/jewellers/app/` | Daily gold/silver rates (every price recomputes), stock, customer ledgers, gold savings schemes, orders and repairs, birthday/anniversary wishes, item cards as images |
 
@@ -70,7 +70,8 @@ All three apps share the same pattern:
 - **Demo PIN screen** (`1234`, shown on screen while it is still the default). It is a convenience lock for a shared phone, not security.
 - **Bottom navigation, big buttons, sticky primary action** (the round button above the nav), designed for a 360 px phone.
 - **Works offline**: the service worker pre-caches the whole app on first visit. Install it with the browser's “Add to Home screen” / “Install app” (also offered in Settings when the browser supports it).
-- **Demo data**: on first open each app seeds realistic fictional data, generated *relative to today* so the demo always looks current (members due this week, today's orders, schemes due…). Every screen is marked **Demo data**, and Settings has **Reset demo data**.
+- **Demo data**: on first open each app seeds realistic fictional data, generated *relative to today* so the demo always looks current (members due this week, today's orders, schemes due…). While it holds sample data, the strip under the header is yellow and says **Demo data**; Settings has **Reset demo data**.
+- **Start with an empty business** (Settings → *Demo or real business*): after two confirmations it deletes the sample records and keeps the settings, so a real client can start the same day. The strip then turns green and says **My data**, Settings shows the date the business was started, and printed receipts/bills no longer carry the “Demo data” stamp.
 - **Backup / restore** as JSON (Settings), and CSV exports in the gym reports.
 - **Everything recalculates by itself**: on every open, at midnight, and when the app comes back to the foreground on a new day.
 
@@ -85,11 +86,12 @@ All three apps share the same pattern:
 7. **Reminders**: auto-built queues (due soon, overdue, expired, inactive, birthdays). Each row opens WhatsApp with a ready message (name, amount, date) in English, Hindi or Punjabi. **Send one by one** walks the queue and marks each person *reminded today*, so nobody gets messaged twice.
 8. **Reports**: monthly collection chart, payment modes, members by plan, dues list, members who left, CSV export of members / payments / attendance, printable member statement (from a member's profile).
 9. **Members list**: search, status pills, plan filter, sort, quick actions (call, WhatsApp, renew, check in), profile with payments, attendance calendar and a timeline of joins, payments, freezes, reminders and visits.
-10. **Settings**: gym name, plan names/months/prices, due-soon days, overdue→expired window, late fee and when it applies, inactive days, language, PIN, backup/restore, reset.
+10. **Enquiries**: free-trial requests from the website form arrive in the app (dashboard card **New enquiries** with a count badge, plus a short list on the dashboard; full list at *New enquiries → Enquiries*). Each shows name, phone, goal, preferred time, date and status (*New → Contacted → Joined / Not interested*). One tap to call or WhatsApp (message in English, Hindi or Punjabi; calling or messaging a *New* enquiry marks it *Contacted*), change status, delete, and **Convert to member**, which opens Add Member pre-filled with the name, phone and goal and marks the enquiry *Joined* with the new member ID. Included in the JSON backup and as *Enquiries CSV* in Reports. Five clearly fictional sample enquiries (“… (sample)”, numbers starting with 5) are seeded.
+11. **Settings**: gym name, plan names/months/prices, due-soon days, overdue→expired window, late fee and when it applies, inactive days, language, PIN, backup/restore, reset.
 
 ### Restaurant
 
-The public site and the owner app share one store, so **orders placed from the website cart appear on the owner's orders board** (open both in the same browser to see the loop; the board updates live across tabs). The owner can mark dishes sold out or “Today's special” and the website menu follows. The app has the orders board (New → Preparing → Ready → Delivered / Cancelled), counter orders, “your order is ready” WhatsApp messages, printable KOT and bill, bookings, daily sales and best sellers (SVG charts), customers with repeat-order counts, and a **menu QR code generated in the browser** (no external service).
+Menu descriptions and the sample order/booking notes are shown in Hindi and Punjabi too (dish names stay as they are; once the owner edits a description, their own text is shown). The public site and the owner app share one store, so **orders placed from the website cart appear on the owner's orders board** (open both in the same browser to see the loop; the board updates live across tabs). The owner can mark dishes sold out or “Today's special” and the website menu follows. The app has the orders board (New → Preparing → Ready → Delivered / Cancelled), counter orders, “your order is ready” WhatsApp messages, printable KOT and bill, bookings, daily sales and best sellers (SVG charts), customers with repeat-order counts, and a **menu QR code generated in the browser** (no external service).
 
 ### Jewellers
 
@@ -103,8 +105,25 @@ The owner enters today's **gold 24K/22K/18K (per 10 g) and silver (per kg)** rat
 2. Edit **`js/config.js`**: paste the client's WhatsApp number (with country code, e.g. `9198…`), email, address and Google Maps link. Anything still starting with `PASTE_` is hidden automatically — no placeholder text ever shows. Until a number is set, WhatsApp buttons open WhatsApp's contact picker with the message ready.
 3. Change the business name and texts in `js/i18n-<site>.js` (all three languages sit side by side), and the colours in `<demo>/css/site.css` and `<demo>/app/css/app.css`.
 4. Replace the illustrations with real photos (restaurant and jeweller items already accept a photo URL in the owner app).
-5. To start a real client with **no sample data**, make the demo's seed function (`gym/app/js/seed.js` → `seedGym`, `restaurant/js/data.js` → `seedRestaurant`, `jewellers/js/data.js` → `seedJewellers`) return empty lists and remove the “Demo data” strip; then set real plans/prices/PIN in Settings.
-6. Regenerate icons with `node tools/make-icons.cjs` after changing colours/initials.
+5. Regenerate icons with `node tools/make-icons.cjs` after changing colours/initials.
+
+### Handing an app over to a real client
+
+No code change is needed to remove the sample data — it is done on the client's phone:
+
+1. Open the owner app on the client's phone (the deployed URL, e.g. `…/gym/app/`) and install it (*Add to Home screen* / *Install app*).
+2. Unlock with the demo PIN `1234` and open **Settings**.
+3. Set the real details first: business name, prices (gym plans / GST and delivery / scheme bonus), rules, and a **new PIN**. Tap *Save*. Choose the language the owner prefers.
+4. Restaurant: edit the menu (dishes, prices, sold out). Jewellers: enter today's gold and silver rates.
+5. In **Demo or real business**, tap **Start with an empty business** and confirm twice. What is removed and what is kept:
+   - **Gym** — removes members, payments, check-ins, enquiries; keeps gym name, plans and prices, rules, PIN.
+   - **Restaurant** — removes orders, bookings (and so customers); keeps name, the menu with categories and prices, GST, delivery charge, tables, PIN.
+   - **Jewellers** — removes stock items, customers and ledgers, scheme members, orders/repairs, viewings; keeps name, today's rates, scheme plans, GST, PIN.
+   The language choice is stored separately and is never touched.
+6. Check the strip under the header now says **My data** (green). Add the first real record.
+7. Show the owner **Backup (JSON)** and agree how often to take one (weekly is a good default); data lives only on that phone.
+
+“Reset demo data” is still in Settings for showing the demo again; it replaces everything with fresh samples, so do not use it on a real client's phone.
 
 ### What “demo data” means
 
@@ -115,7 +134,7 @@ The sample members, orders, customers and schemes are made up and regenerated re
 - **Data lives in the browser (localStorage)** on one device. Clearing browser data deletes it, and two phones do not sync. Take regular JSON backups. localStorage holds roughly 5 MB per site — enough for years of a small business's records, but member photos are shrunk to small thumbnails for this reason.
 - **No server means no automatic messages.** Reminders, receipts and order updates open WhatsApp with a pre-filled message; a person taps *Send*. Nothing is sent in the background, and the demo cannot know whether a message was actually delivered.
 - **The PIN is not security.** Data is not encrypted; anyone with the unlocked phone and browser can read it.
-- Website forms (free trial, bookings, viewings) are demos: they save to the same browser and offer a WhatsApp hand-off; they do not email anyone.
+- Website forms (free trial, bookings, viewings) save to the same browser and offer a WhatsApp hand-off; they do not email anyone. Free-trial enquiries reach the gym owner app only when the website and the app are opened in the same browser on the same device — a real deployment needs the backend described below.
 - Gold/silver rates are typed in by the owner; there is no live market feed.
 
 ## Production upgrade path
@@ -133,6 +152,8 @@ The sample members, orders, customers and schemes are made up and regenerated re
 `npm test` runs Node's built-in test runner over `tests/` (no dependencies):
 
 - `dates.test.js` — day/month arithmetic (month-end clamping, leap years, DST-safe), anniversaries incl. 29 Feb, Punjabi date formatting.
+- `gym-enquiries.test.js` — **enquiry status flow** (New → Contacted → Joined / Not interested, history, re-opening, invalid status), call/WhatsApp marks *Contacted*, **convert-to-member prefill** (name, clean 10-digit phone, goal note), website-form import without duplicates, sample enquiries, v2 → v3 migration, empty gym keeps settings.
+- `start-empty.test.js` — *Start with an empty business* in the store (keeps settings, not demo any more, survives reload and backup round-trip, reset brings the demo back), restaurant and jewellers empty data, Hindi/Punjabi dish descriptions in the right script, translated sample notes.
 - `gym-logic.test.js` — expiry, due-soon window, overdue days and expired, freeze shifting expiry, renewal start date, partial payments and balance, discounts, late fee rules, streaks, inactivity, visits after expiry, reminder queues, monthly collection.
 - `restaurant-logic.test.js` — cart, GST/delivery totals, WhatsApp order text, daily sales, best sellers, customers.
 - `jewellers-logic.test.js` — rate per gram, price breakup, **gold-rate price recompute**, **savings-scheme dues** (on track / due soon / due / overdue / completed / matured), ledger balance, late jobs, occasions.

@@ -263,3 +263,11 @@ table.tbl{width:100%;border-collapse:collapse;font-size:14px}
 
 .field .lang-switch{align-self:flex-start}
 .field .lang-switch button{min-height:40px;padding:8px 14px;font-size:14px}
+
+/* Demo data vs the owner's own data */
+.demo-strip.is-real{background:var(--ok-bg, color-mix(in srgb, var(--ok) 16%, var(--surface)))}
+.demo-strip.is-real .demo-badge{background:var(--ok);color:#06281c}
+.data-state.is-demo{border-color:color-mix(in srgb,var(--warn) 55%,var(--line))}
+.data-state.is-real{border-color:color-mix(in srgb,var(--ok) 55%,var(--line))}
+.data-state-line{font-weight:600;line-height:1.5}
+.data-state-line .chip{vertical-align:middle;margin-right:4px}

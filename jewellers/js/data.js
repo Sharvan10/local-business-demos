@@ -67,7 +67,14 @@ export function seedJewellers(today = todayISO()) {
   return { settings, rates: { ...DEFAULT_RATES }, rateHistory: [{ date: addDays(today, -1), ...DEFAULT_RATES, gold24: DEFAULT_RATES.gold24 - 350, gold22: DEFAULT_RATES.gold22 - 320, gold18: DEFAULT_RATES.gold18 - 260 }, { date: today, ...DEFAULT_RATES }], items, customers, schemes, enrolments, jobs, viewings: [], seededFor: today };
 }
 
-export const jewStore = createStore({ key: JEW_KEY, version: 1, seed: () => seedJewellers() });
+/** "Start with an empty business": no stock, customers, scheme members, jobs or viewings.
+ *  Settings, today's rates and the scheme plans stay. */
+export function emptyJewellers(current) {
+  const rates = current.rates || { ...DEFAULT_RATES };
+  return { settings: current.settings, rates, rateHistory: [{ date: todayISO(), ...rates }], items: [], customers: [], schemes: current.schemes || [], enrolments: [], jobs: [], viewings: [] };
+}
+
+export const jewStore = createStore({ key: JEW_KEY, version: 1, seed: () => seedJewellers(), empty: emptyJewellers });
 export const jName = (it, lang) => (it.name && (it.name[lang] || it.name.en)) || '';
 
 const TONES = { '24K': ['#f7d77c', '#b8862b'], '22K': ['#f3cf6e', '#a87a22'], '18K': ['#f0d9a0', '#a8875a'], '999': ['#f2f4f7', '#9aa3ad'], '925': ['#e8ebef', '#8a939d'] };

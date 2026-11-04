@@ -49,3 +49,13 @@
 .rep-2{grid-template-columns:minmax(0,1fr)}
 @media (min-width:700px){.rep-2{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
 details summary{cursor:pointer;min-height:32px;display:flex;align-items:center}
+
+/* Enquiries */
+.stat .count-badge{position:absolute;right:4px;top:4px;min-width:20px;height:20px;padding:0 6px;border-radius:999px;background:var(--danger);color:#fff;font:700 12px/20px var(--font-body, inherit);text-align:center;font-family:inherit}
+.stat.enq-new{border-color:color-mix(in srgb,var(--accent) 60%,var(--line))}
+.enq-card .mlink{cursor:default}
+.enq-card .main .sub + .sub{margin-top:1px}
+.enq-act{flex-wrap:wrap}
+.enq-act .enq-status{flex:1 1 120px;min-width:0;height:38px;padding:0 8px;font-size:13.5px}
+.enq-act .btn{flex:1 1 140px}
+@media (min-width:700px){.enq-card .enq-act{padding:0 12px 12px;flex-wrap:nowrap}.enq-card{flex-wrap:wrap}.enq-card .enq-act .btn{flex:none}}

@@ -11,21 +11,24 @@ import { pinGate, lockNow } from '../../../shared/pin.js';
 import { registerPWA, bindInstallButton } from '../../../shared/pwa.js';
 import { GYM_APP_I18N } from '../../../js/i18n-gym-app.js';
 import * as L from './logic.js';
-import { seedGym, GYM_STORE_VERSION, gymMigrations } from './seed.js';
+import { seedGym, emptyGym, GYM_STORE_VERSION, gymMigrations } from './seed.js';
+import { paintDataStrip, dataStateCard, startEmptyFlow } from '../../../shared/demo-mode.js';
 
 const APP_KEY = 'ironcore.gym';
-const store = createStore({ key: APP_KEY, version: GYM_STORE_VERSION, seed: () => seedGym(), migrations: gymMigrations });
+const store = createStore({ key: APP_KEY, version: GYM_STORE_VERSION, seed: () => seedGym(), migrations: gymMigrations, empty: emptyGym });
+const SITE_ENQ_KEY = 'ironcore.enquiries'; // written by the public site's free-trial form
 const i18n = createI18n(GYM_APP_I18N);
 const t = (k, v) => i18n.t(k, v);
 const view = $('#view');
 let TODAY = D.todayISO();
 let C = null; // computed context
-const ui = { filter: 'all', special: '', plan: '', sort: 'expiry', q: '', calMonth: null, profileTab: 'pay', checkTab: 'today', remType: 'due', msgLang: null, reportMonths: 6 };
+const ui = { enqFilter: 'all', filter: 'all', special: '', plan: '', sort: 'expiry', q: '', calMonth: null, profileTab: 'pay', checkTab: 'today', remType: 'due', msgLang: null, reportMonths: 6 };
 
 // ---------- computed state ----------
 function compute() {
   TODAY = D.todayISO();
   const d = store.data;
+  if (!Array.isArray(d.enquiries)) d.enquiries = [];
   const summaries = new Map(d.members.map((m) => [m.id, L.summarize(m, d.payments, d.settings, TODAY)]));
   const attIndex = L.indexAttendance(d.attendance);
   C = { d, s: d.settings, summaries, attIndex };
@@ -42,6 +45,7 @@ const nextNo = (kind) => { C.d.counters[kind] = (C.d.counters[kind] || 0) + 1; r
 const newReceiptNo = () => `IC-${TODAY.slice(0, 4)}-${String(nextNo('receipt')).padStart(4, '0')}`;
 const uidL = (p) => `${p}${Date.now().toString(36)}${Math.random().toString(36).slice(2, 5)}`;
 
+const demoStamp = () => (store.isDemo ? `<span class="stamp">${esc(t('demo.badge'))}</span>` : '');
 function statusChip(s) {
   switch (s.status) {
     case 'active': return `<span class="chip ok">${t('st.active')}</span>`;
@@ -104,14 +108,15 @@ function parseHash() {
 function render() {
   compute();
   const { name, arg, params } = parseHash();
-  const views = { '': vDashboard, members: vMembers, m: vProfile, add: vForm, edit: vForm, checkin: vCheckin, reminders: vReminders, reports: vReports, settings: vSettings };
+  const views = { '': vDashboard, members: vMembers, m: vProfile, add: vForm, edit: vForm, checkin: vCheckin, reminders: vReminders, reports: vReports, settings: vSettings, enquiries: vEnquiries };
   const fn = views[name] || vDashboard;
-  const navKey = name === 'm' || name === 'add' || name === 'edit' ? 'members' : name === 'settings' ? '' : name;
+  const navKey = name === 'm' || name === 'add' || name === 'edit' ? 'members' : name === 'settings' || name === 'enquiries' ? '' : name;
   renderNav(navKey);
   const out = fn(arg, params);
   view.innerHTML = out.html;
   const f = document.getElementById('fab');
   if (out.fab) { f.outerHTML = out.fab; } else { f.outerHTML = '<a id="fab" class="fab" hidden></a>'; }
+  paintDataStrip(store.isDemo, t);
   $('#brand-name').textContent = C.s.gymName;
   $('#brand-sub').textContent = fd(TODAY, { weekday: 'long', day: 'numeric', month: 'long' });
   if (out.mount) out.mount();
@@ -154,11 +159,13 @@ function vDashboard() {
   const attention = C.d.members.filter((m) => ['overdue', 'due'].includes(S(m.id).status))
     .sort((a, b) => S(a.id).daysLeft - S(b.id).daysLeft).slice(0, 5);
   const recent = x.todayAtt.slice(-5).reverse();
+  const newEnq = C.d.enquiries.filter((e) => e.status === 'new');
   return {
     html: `
     <h1 class="view-title">${esc(hello())} 👋 <small class="block">${esc(t('dash.sub'))}</small></h1>
     <div class="stats">
       ${stat({ href: '#/reports', k: t('dash.collection'), v: money(x.coll), sub: x.collLast && trend ? esc(t(trend >= 0 ? 'dash.up' : 'dash.down', { n: Math.abs(trend) })) : '', ic: 'rupee', cls: 'hero' })}
+      ${stat({ href: '#/enquiries?f=new', k: t('dash.newEnq'), v: `${newEnq.length}${newEnq.length ? `<span class="count-badge" aria-hidden="true">${newEnq.length}</span>` : ''}`, sub: esc(t('dash.newEnqSub')), ic: 'bell', cls: newEnq.length ? 'enq-new' : '' })}
       ${stat({ href: '#/members?f=live', k: t('dash.active'), v: x.live.length, ic: 'users', cls: 'ok' })}
       ${stat({ href: '#/members?s=dueweek', k: t('dash.dueWeek'), v: x.dueWeek.length, ic: 'calendar', cls: 'warn' })}
       ${stat({ href: '#/members?s=dues', k: t('dash.overdueAmt'), v: money(x.overdueAmt), sub: esc(t('dash.overdueN', { n: x.overdue.length })), ic: 'alert', cls: 'danger' })}
@@ -168,6 +175,9 @@ function vDashboard() {
       ${stat({ href: '#/members?s=inactive', k: t('dash.inactive'), v: x.inactive.length, sub: esc(t('dash.notSeen', { n: C.s.inactiveDays })), ic: 'fire' })}
       ${stat({ href: '#/members?s=birthdays', k: t('dash.bdays'), v: x.bdays.length, ic: 'cake' })}
     </div>
+    ${newEnq.length ? `<h2 class="section-h">${esc(t('dash.enqList'))} <span class="chip accent plain">${newEnq.length}</span></h2>
+    <div class="list">${newEnq.slice(0, 3).map(enqCard).join('')}</div>
+    <a class="btn sm ghost mt" href="#/enquiries">${esc(t('dash.enqAll'))} →</a>` : ''}
     <h2 class="section-h">${esc(t('dash.attention'))}</h2>
     ${attention.length ? `<div class="list">${attention.map(memberRow).join('')}</div>` : `<p class="empty">${esc(t('dash.allClear'))}</p>`}
     <h2 class="section-h">${esc(t('dash.recent'))}</h2>
@@ -361,22 +371,25 @@ function timeline(m, s, att) {
 }
 
 // ---------- Add / edit member ----------
-function vForm(id) {
+function vForm(id, params) {
   const m = id ? M(id) : null;
   const plans = C.s.plans;
+  const enq = !m && params && params.get('enq') ? C.d.enquiries.find((e) => e.id === params.get('enq')) : null;
+  const pre = enq ? L.enquiryPrefill(enq, goalLabel(enq.goal), t('enq.note')) : { name: '', phone: '', notes: '' };
   return {
     html: `
     <a href="${m ? `#/m/${m.id}` : '#/members'}" class="btn sm ghost" style="margin-bottom:8px">${icon('back')}${esc(t('a.back'))}</a>
     <h1 class="view-title">${esc(m ? t('f.editTitle') : t('m.add'))}</h1>
+    ${enq ? `<div class="alert ok mb"><span class="ico">📝</span><div><strong>${esc(t('enq.fromEnq', { name: enq.name }))}</strong></div></div>` : ''}
     <form id="mform" class="form card" novalidate>
       <div class="flex">
         <label class="photo-pick" aria-label="${esc(t('f.photo'))}">
           <input type="file" accept="image/*" capture="user" id="photo" class="sr-only">
           <span id="photo-prev">${m && m.photo ? `<img src="${esc(m.photo)}" alt="">` : icon('image')}</span>
         </label>
-        <div class="grow"><label class="field"><span>${esc(t('f.name'))} *</span><input name="name" required autocomplete="off" value="${esc(m ? m.name : '')}" ${m ? '' : 'autofocus'}></label></div>
+        <div class="grow"><label class="field"><span>${esc(t('f.name'))} *</span><input name="name" required autocomplete="off" value="${esc(m ? m.name : pre.name)}" ${m ? '' : 'autofocus'}></label></div>
       </div>
-      <label class="field"><span>${esc(t('f.phone'))} *</span><input name="phone" type="tel" inputmode="tel" required value="${esc(m ? m.phone : '')}" placeholder="98xxx xxxxx"></label>
+      <label class="field"><span>${esc(t('f.phone'))} *</span><input name="phone" type="tel" inputmode="tel" required value="${esc(m ? m.phone : pre.phone)}" placeholder="98xxx xxxxx"></label>
       <div class="form">
         <div class="field"><span class="lbl">${esc(t('f.gender'))}</span><div class="seg">${['M', 'F'].map((g) => `<label><input type="radio" name="gender" value="${g}" ${m && m.gender === g ? 'checked' : ''}><span>${esc(t(`g.${g}`))}</span></label>`).join('')}</div></div>
         <label class="field"><span>${esc(t('f.dob'))}</span><input name="dob" type="date" max="${TODAY}" value="${esc(m ? m.dob || '' : '')}"></label>
@@ -390,7 +403,7 @@ function vForm(id) {
       <p class="small muted" id="exp-preview"></p>
       <label class="field"><span>${esc(t('f.paidNow'))}</span><input name="amount" type="number" inputmode="numeric" min="0" step="50" value="${plans[0].price}"><span class="hint" id="bal-hint"></span></label>
       <div class="field"><span class="lbl">${esc(t('f.mode'))}</span>${modeSeg()}</div>`}
-      <label class="field"><span>${esc(t('f.notes'))}</span><textarea name="notes" rows="2">${esc(m ? m.notes || '' : '')}</textarea></label>
+      <label class="field"><span>${esc(t('f.notes'))}</span><textarea name="notes" rows="2">${esc(m ? m.notes || '' : pre.notes)}</textarea></label>
       <div class="sheet-actions sticky-save"><button class="btn primary big" type="submit">${icon('check')}${esc(m ? t('a.save') : t('f.addSave'))}</button></div>
     </form>`,
     mount() {
@@ -435,7 +448,11 @@ function vForm(id) {
         let payment = null;
         const amt = Number(v.amount) || 0;
         if (amt > 0) payment = { id: uidL('pay'), memberId: nid, date: TODAY, amount: amt, mode: v.mode || 'Cash', periodId: period.id, periodStart: period.start, periodEnd: L.periodEnd(period), receiptNo: newReceiptNo(), kind: 'join' };
-        store.update((d) => { d.members.push(member); if (payment) d.payments.push(payment); });
+        store.update((d) => {
+          d.members.push(member);
+          if (payment) d.payments.push(payment);
+          if (enq) d.enquiries = d.enquiries.map((e) => (e.id === enq.id ? L.setEnquiryStatus(e, 'joined', TODAY, nid) : e));
+        });
         location.hash = `#/m/${nid}`;
         toast(t('f.added', { id: nid }), 'ok');
         if (payment) setTimeout(() => showReceipt(payment.id), 250);
@@ -550,7 +567,7 @@ function receiptHTML({ p, m, s }) {
   <tr><th>${esc(t('f.mode'))}</th><td>${esc(t(`mode.${p.mode}`))}</td></tr>
   <tr class="tot"><td>${esc(t('rc.amount'))}</td><td class="r">${money(p.amount)}</td></tr>
   <tr><th>${esc(t('rc.balance'))}</th><td class="r">${money(s.balance)}</td></tr>
-  </tbody></table><p><span class="stamp">${esc(t('demo.badge'))}</span> ${esc(t('rc.thanks'))}</p></div>`;
+  </tbody></table><p>${demoStamp()} ${esc(t('rc.thanks'))}</p></div>`;
 }
 function receiptCanvas({ p, m, s }) {
   const W = 720, H = 900, c = document.createElement('canvas');
@@ -571,7 +588,7 @@ function receiptCanvas({ p, m, s }) {
     wrapText(x, v, W - 96).forEach((ln, i) => x.fillText(ln, 48, y + 40 + i * 36));
     y += 110;
   });
-  x.fillStyle = '#ffd84d'; x.font = font(700, 20); x.fillText(t('demo.badge'), 48, H - 50);
+  if (store.isDemo) { x.fillStyle = '#ffd84d'; x.font = font(700, 20); x.fillText(t('demo.badge'), 48, H - 50); }
   x.fillStyle = '#9aa3b2'; x.font = font(600, 20); x.fillText(t('rc.thanks'), 48, H - 80);
   return c;
 }
@@ -595,7 +612,7 @@ function showReceipt(payId) {
 function statementHTML(m) {
   const s = S(m.id);
   const att = C.attIndex.get(m.id) || [];
-  return `<div class="doc"><div class="doc-head"><div><h1>${esc(C.s.gymName)}</h1><div>${esc(t('st.title'))}</div></div><div style="text-align:right">${esc(fd(TODAY))}<br><span class="stamp">${esc(t('demo.badge'))}</span></div></div>
+  return `<div class="doc"><div class="doc-head"><div><h1>${esc(C.s.gymName)}</h1><div>${esc(t('st.title'))}</div></div><div style="text-align:right">${esc(fd(TODAY))}${store.isDemo ? '<br>' : ''}${demoStamp()}</div></div>
   <p><strong>${esc(m.name)}</strong> (${esc(m.id)}) · ${esc(fmtPhone(m.phone))}<br>${esc(t('p.since'))}: ${esc(fd(s.memberSince))} · ${esc(t('p.visitsTotal'))}: ${att.length}</p>
   <h3>${esc(t('st.periods'))}</h3><table><thead><tr><th>${esc(t('p.plan'))}</th><th>${esc(t('rc.period'))}</th><th class="r">${esc(t('st.fee'))}</th></tr></thead><tbody>
   ${s.periods.map((p) => `<tr><td>${esc(planName(L.planById(C.s, p.planId)))}</td><td>${esc(fd(p.start))} – ${esc(fd(p.end))}</td><td class="r">${money(p.billed)}${p.discount ? ` <small>(−${money(p.discount)})</small>` : ''}${p.lateFee ? ` <small>(+${money(p.lateFee)})</small>` : ''}</td></tr>`).join('')}
@@ -820,6 +837,7 @@ function vReports() {
       <button type="button" class="btn" data-act="csv" data-k="members">${icon('download')}${esc(t('rp.csvMembers'))}</button>
       <button type="button" class="btn" data-act="csv" data-k="payments">${icon('download')}${esc(t('rp.csvPayments'))}</button>
       <button type="button" class="btn" data-act="csv" data-k="attendance">${icon('download')}${esc(t('rp.csvAttendance'))}</button>
+      <button type="button" class="btn" data-act="csv" data-k="enquiries">${icon('download')}${esc(t('rp.csvEnquiries'))}</button>
       <button type="button" class="btn" data-act="backup">${icon('download')}${esc(t('s.backup'))}</button>
     </div>
     <p class="small muted mt">${esc(t('rp.statementHint'))}</p>`,
@@ -839,11 +857,82 @@ function exportCSV(kind) {
       { key: 'receiptNo', label: 'Receipt' }, { key: 'date', label: 'Date' }, { key: 'memberId', label: 'Member ID' }, { label: 'Name', value: (p) => (M(p.memberId) || {}).name || '' },
       { key: 'amount', label: 'Amount' }, { key: 'mode', label: 'Mode' }, { key: 'periodStart', label: 'Period from' }, { key: 'periodEnd', label: 'Period to' }, { key: 'kind', label: 'Type' },
     ]);
+  } else if (kind === 'enquiries') {
+    csv = toCSV(C.d.enquiries.slice().sort((a, b) => (a.date < b.date ? 1 : -1)), [
+      { key: 'date', label: 'Date' }, { key: 'name', label: 'Name' }, { key: 'phone', label: 'Phone' }, { label: 'Goal', value: (e) => goalLabel(e.goal, 'en') },
+      { label: 'Preferred time', value: (e) => (e.time ? i18n_t('en', `tm.${e.time}`) : '') }, { label: 'Status', value: (e) => i18n_t('en', `enq.st.${e.status}`) },
+      { key: 'statusDate', label: 'Status date' }, { key: 'memberId', label: 'Member ID' }, { key: 'source', label: 'Source' },
+    ]);
   } else {
     csv = toCSV(C.d.attendance, [{ key: 'd', label: 'Date' }, { key: 't', label: 'Time' }, { key: 'm', label: 'Member ID' }, { label: 'Name', value: (a) => (M(a.m) || {}).name || '' }]);
   }
   download(`ironcore-${kind}-${TODAY}.csv`, csv, 'text/csv');
 }
+
+// ---------- Enquiries (free-trial form on the public site) ----------
+/** Move new website-form entries into the app (each once), then empty the site's inbox. Returns how many arrived. */
+function pullSiteEnquiries(notify) {
+  let inbox = [];
+  try { inbox = JSON.parse(localStorage.getItem(SITE_ENQ_KEY) || '[]'); } catch { return 0; }
+  if (!Array.isArray(inbox) || !inbox.length) return 0;
+  let added = 0;
+  store.update((d) => { const r = L.importSiteEnquiries(d.enquiries || [], inbox, D.todayISO()); d.enquiries = r.list; added = r.added; });
+  try { localStorage.removeItem(SITE_ENQ_KEY); } catch { /* blocked */ }
+  if (added && notify) toast(t('enq.imported', { n: added }), 'ok');
+  return added;
+}
+function updateEnquiry(id, fn) { store.update((d) => { d.enquiries = d.enquiries.map((e) => (e.id === id ? fn(e) : e)); }); }
+function goalLabel(goal, lang = i18n.lang) { return goal && /^goal\.\d$/.test(goal) ? i18n_t(lang, goal) : (goal || ''); }
+function enqText(e, lang = ui.msgLang || i18n.lang) { return i18n_t(lang, 'msg.enquiry', { name: firstName(String(e.name).replace(/\s*\(.*\)\s*$/, '')), gym: C.s.gymName }); }
+const ENQ_CHIP = { new: 'accent', contacted: 'info', joined: 'ok', lost: '' };
+function enqCard(e) {
+  const tel = telLink(e.phone);
+  const goal = goalLabel(e.goal);
+  const member = e.memberId ? M(e.memberId) : null;
+  return `<article class="mcard enq-card" id="enq-${esc(e.id)}">
+    <div class="mlink">${avatar(String(e.name).replace(/\s*\(.*\)\s*$/, ''), '', 44)}
+      <span class="main"><span class="t">${esc(e.name)}</span><span class="sub">${esc(fmtPhone(e.phone))} · ${esc(t('enq.on', { date: fdShort(e.date) }))}</span>
+      ${goal || e.time ? `<span class="sub">${goal ? `${esc(t('enq.goal'))}: ${esc(goal)}` : ''}${goal && e.time ? ' · ' : ''}${e.time ? `${esc(t(`tm.${e.time}`))}` : ''}</span>` : ''}</span>
+      <span class="end"><span class="chip ${ENQ_CHIP[e.status] || ''}">${esc(t(`enq.st.${e.status}`))}</span></span>
+    </div>
+    <div class="mact enq-act">
+      ${tel ? `<a class="icon-btn" href="${tel}" data-act="enq-contact" data-id="${esc(e.id)}" aria-label="${esc(t('a.call'))} ${esc(e.name)}">${icon('phone')}</a>` : ''}
+      <a class="icon-btn wa" href="${esc(waLink(e.phone, enqText(e)))}" target="_blank" rel="noopener" data-act="enq-contact" data-id="${esc(e.id)}" aria-label="WhatsApp ${esc(e.name)}">${icon('wa')}</a>
+      <label class="sr-only" for="es-${esc(e.id)}">${esc(t('enq.status'))}</label>
+      <select class="enq-status" id="es-${esc(e.id)}" data-id="${esc(e.id)}">${L.ENQ_STATUS.map((k) => `<option value="${k}" ${e.status === k ? 'selected' : ''}>${esc(t(`enq.st.${k}`))}</option>`).join('')}</select>
+      ${member ? `<a class="btn sm secondary" href="#/m/${member.id}">${esc(t('enq.openMember', { id: member.id }))}</a>` : `<a class="btn sm secondary" href="#/add?enq=${encodeURIComponent(e.id)}">${icon('plus')}${esc(t('enq.convert'))}</a>`}
+      <button type="button" class="icon-btn" data-act="enq-delete" data-id="${esc(e.id)}" aria-label="${esc(t('enq.delete'))} ${esc(e.name)}">${icon('trash')}</button>
+    </div>
+  </article>`;
+}
+function vEnquiries(arg, params) {
+  if (params.has('f')) ui.enqFilter = params.get('f');
+  const all = C.d.enquiries.slice().sort((a, b) => (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+  const counts = L.enquiryCounts(all);
+  const list = ui.enqFilter === 'all' ? all : all.filter((e) => e.status === ui.enqFilter);
+  const lang = ui.msgLang || i18n.lang;
+  return {
+    html: `
+    <a href="#/" class="btn sm ghost" style="margin-bottom:8px">${icon('back')}${esc(t('a.back'))}</a>
+    <h1 class="view-title">${esc(t('nav.enquiries'))} <small>${all.length}</small></h1>
+    <p class="small muted">${esc(t('enq.help'))}</p>
+    <div class="pills" role="group" aria-label="${esc(t('enq.status'))}">${['all', ...L.ENQ_STATUS].map((k) => `<button type="button" class="pill" data-act="efilter" data-f="${k}" aria-pressed="${ui.enqFilter === k}">${esc(k === 'all' ? t('enq.all') : t(`enq.st.${k}`))}<span class="n">${counts[k] || 0}</span></button>`).join('')}</div>
+    <div class="flex between wrap mb"><span class="small muted">${esc(t('rm.msgLang'))}</span><div class="lang-mini" role="group">${['en', 'hi', 'pa'].map((l) => `<button type="button" class="pill" data-act="mlang" data-l="${l}" aria-pressed="${lang === l}" lang="${l}">${l === 'en' ? 'English' : l === 'hi' ? 'हिंदी' : 'ਪੰਜਾਬੀ'}</button>`).join('')}</div></div>
+    ${list.length ? `<div class="list">${list.map(enqCard).join('')}</div>` : `<p class="empty"><span class="big">📭</span>${esc(t('enq.empty'))}</p>`}
+    ${list[0] ? `<details class="card mt"><summary><strong>${esc(t('rm.preview'))}</strong></summary><div class="msg-preview" lang="${lang}">${esc(enqText(list[0], lang))}</div></details>` : ''}`,
+    mount() {
+      if (params.has('f')) history.replaceState(null, '', '#/enquiries');
+    },
+  };
+}
+// status <select> works on the dashboard and the enquiries screen
+document.addEventListener('change', (e) => {
+  const sel = e.target.closest('select.enq-status');
+  if (!sel) return;
+  updateEnquiry(sel.dataset.id, (x) => L.setEnquiryStatus(x, sel.value, TODAY, x.memberId));
+  toast(t('enq.statusSaved', { status: t(`enq.st.${sel.value}`) }), 'ok');
+  render();
+});
 
 // ---------- Settings ----------
 function vSettings() {
@@ -885,9 +974,9 @@ function vSettings() {
         <button type="button" class="btn" id="install-btn" hidden>${icon('install')}${esc(t('s.install'))}</button>
       </div>
       <p class="small muted mt">${esc(t('s.dataHelp'))}</p>
-      <button type="button" class="btn danger block mt" data-act="reset">${icon('trash')}${esc(t('s.reset'))}</button>
     </section>
-    <p class="small muted mt">${esc(t('s.about'))}</p>`,
+    ${dataStateCard({ store, t, fd })}
+    ${store.isDemo ? `<p class="small muted mt">${esc(t('s.about'))}</p>` : ''}`,
     mount() {
       i18n.mountSwitch($('#sform'));
       bindInstallButton($('#install-btn'));
@@ -949,12 +1038,21 @@ const actions = {
     if (!(await confirmBox(t('s.resetQ'), { ok: t('s.reset'), cancel: t('a.cancel'), danger: true }))) return;
     store.reset(); toast(t('s.resetDone'), 'ok'); location.hash = '#/'; render();
   },
+  'start-empty': async () => { if (await startEmptyFlow({ store, t })) { location.hash = '#/'; render(); } },
+  efilter: (el) => { ui.enqFilter = el.dataset.f; render(); },
+  'enq-contact': (el) => { updateEnquiry(el.dataset.id, (e) => L.afterContact(e, TODAY)); setTimeout(render, 400); return true; },
+  'enq-delete': async (el) => {
+    const e = C.d.enquiries.find((x) => x.id === el.dataset.id);
+    if (!e || !(await confirmBox(t('enq.deleteQ', { name: e.name }), { ok: t('enq.delete'), cancel: t('a.cancel'), danger: true }))) return;
+    store.update((d) => { d.enquiries = d.enquiries.filter((x) => x.id !== e.id); });
+    toast(t('enq.deleted')); render();
+  },
   lock: () => lockNow(APP_KEY),
 };
 document.addEventListener('click', (e) => {
   const el = e.target.closest('[data-act]');
   if (!el || !actions[el.dataset.act]) return;
-  const keepDefault = el.tagName === 'A' && el.dataset.act === 'reminded';
+  const keepDefault = el.tagName === 'A' && (el.dataset.act === 'reminded' || el.dataset.act === 'enq-contact');
   if (!keepDefault && el.tagName !== 'INPUT') e.preventDefault();
   actions[el.dataset.act](el);
 });
@@ -964,12 +1062,16 @@ function boot() {
   i18n.mountSwitch(document.querySelector('.app-head'));
   i18n.onChange(() => render());
   window.addEventListener('hashchange', onRoute);
+  pullSiteEnquiries(false);
   onRoute();
   // Recompute at midnight and whenever the app comes back to the foreground on a new day
   const scheduleMidnight = () => setTimeout(() => { render(); scheduleMidnight(); }, D.msUntilNextMidnight());
   scheduleMidnight();
-  document.addEventListener('visibilitychange', () => { if (!document.hidden && D.todayISO() !== TODAY) render(); });
-  window.addEventListener('storage', (e) => { if (e.key === APP_KEY) { store.reload(); render(); } });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) return; if (pullSiteEnquiries(true) || D.todayISO() !== TODAY) render(); });
+  window.addEventListener('storage', (e) => {
+    if (e.key === APP_KEY) { store.reload(); render(); }
+    if (e.key === SITE_ENQ_KEY && pullSiteEnquiries(true)) render();
+  });
 }
 registerPWA({ onUpdate: () => toast(t('s.updated')) });
 pinGate({ appKey: APP_KEY, getPin: () => store.data.settings.pin, t, brand: store.data.settings.gymName, logo: 'IC', onUnlock: boot });

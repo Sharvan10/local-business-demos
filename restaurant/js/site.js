@@ -5,7 +5,7 @@ import { $, esc, money, formData, debounce } from '../../shared/ui.js';
 import { waLink } from '../../shared/wa.js';
 import { cfg } from '../../js/config.js';
 import { todayISO, nowTime, formatDate } from '../../shared/dates.js';
-import { restStore, CATEGORIES, itemName, dishArt } from './data.js';
+import { restStore, CATEGORIES, itemName, itemDesc, dishArt } from './data.js';
 import { setQty, cartLines, billTotals, orderText } from './logic.js';
 
 const CART_KEY = 'spiceroute.cart';
@@ -42,7 +42,7 @@ function renderTabs() {
 function renderMenu() {
   const q = ui.q.trim().toLowerCase();
   const items = data().menu.filter((m) => (ui.cat === 'all' || m.cat === ui.cat) && (!ui.veg || m.veg)
-    && (!q || `${m.name.en} ${m.name.hi} ${m.name.pa} ${m.desc}`.toLowerCase().includes(q)));
+    && (!q || `${m.name.en} ${m.name.hi} ${m.name.pa} ${m.desc} ${itemDesc(m, i18n.lang)}`.toLowerCase().includes(q)));
   items.sort((a, b) => (b.special - a.special) || CATEGORIES.indexOf(a.cat) - CATEGORIES.indexOf(b.cat));
   $('#menu-grid').innerHTML = items.length ? items.map((m) => {
     const qn = qtyOf(m.id);
@@ -51,7 +51,7 @@ function renderMenu() {
       <div class="dish-art">${art(m, 112)}</div>
       <div class="dish-body">
         <h3>${vegIcon(m.veg)} ${esc(nm(m))}</h3>
-        <p class="desc">${esc(m.desc)}</p>
+        <p class="desc">${esc(itemDesc(m, i18n.lang))}</p>
         <div class="dish-meta">${m.special ? `<span class="tag">✦ ${esc(t('menu.special'))}</span>` : ''}${chillies(m.spice)}</div>
         <div class="dish-foot"><span class="price">${money(m.price)}</span>
         ${out ? `<span class="soldout">${esc(t('menu.out'))}</span>` : qn ? stepper(m.id, qn) : `<button type="button" class="add" data-add="${m.id}">${esc(t('menu.add'))} +</button>`}</div>
